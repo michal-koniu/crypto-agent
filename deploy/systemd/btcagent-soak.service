@@ -1,0 +1,16 @@
+# Soak test unit (paper, separate state): restarts on any exit so crash recovery can be exercised.
+[Unit]
+Description=btc-agent SOAK TEST (paper)
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Desktop/github_repos/btc-agent
+ExecStart=%h/Desktop/github_repos/btc-agent/.venv/bin/btcagent --config config/agent.soak.yaml run
+Restart=always
+RestartSec=20
+MemoryMax=2G
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=default.target

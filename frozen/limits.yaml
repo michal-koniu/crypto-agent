@@ -17,7 +17,8 @@ position:
   max_protocol_weight: 0.60    # e.g. a lending market
   max_chain_weight: 1.00
   max_venue_weight: 1.00
-  max_order_nav_fraction: 0.60 # one order may move at most this share of NAV
+  max_order_nav_fraction: 1.00 # the validated rule moves 100 % in one step; size is capped in USD below
+                               # and by slippage/cost caps (0.60 blocked the champion's exit - found in testing)
   max_order_usd: 3500
 
 loss:

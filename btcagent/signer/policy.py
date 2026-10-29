@@ -9,7 +9,8 @@ asked to sign, so a bug or a compromise upstream still cannot make it sign somet
 * Aave v3 supply/withdraw: asset allowlisted, onBehalfOf / to == our own wallet;
 * ERC-20 approve: token allowlisted, spender allowlisted, amount < 2**128 and <= declared spend x multiple;
 * ERC-20 transfer: only while the kill switch is engaged, and only to the human-set safe address;
-* while killed: only exits (swaps into BTC or the stable, withdrawals, approve-to-zero, transfer to safe).
+* while killed: only exits (swaps into BTC or the stable and their exact router approval, withdrawals,
+  approve-to-zero, transfer to safe).
 """
 from __future__ import annotations
 
@@ -65,8 +66,9 @@ def check_tx(req: SignRequest, wallet: str, allow: dict, limits: dict, killed: b
             if amount >= UNLIMITED_FLOOR:
                 v.append("unlimited (or near-unlimited) approval refused")
             if amount > 0:
-                if killed:
-                    v.append("kill switch engaged: only approve-to-zero (revoke) is signed")
+                swap_router = _addr(contracts.get("uniswap_v3_swap_router02", {}).get("address", ""))
+                if killed and _addr(spender) != swap_router:
+                    v.append("kill switch engaged: only revokes, or exact approvals to the swap router for exits, are signed")
                 mult = limits["approvals"]["max_approval_multiple"]
                 if req.declared_spend is None or amount > req.declared_spend * mult:
                     v.append(f"approval {amount} exceeds {mult}x declared spend {req.declared_spend}")

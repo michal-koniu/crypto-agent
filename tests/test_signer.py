@@ -83,6 +83,10 @@ def test_approvals():
     assert any("spender" in v for v in check_tx(req(USDC, evil, declared_spend=100), ME, ALLOW, LIMITS, False))
     revoke = SEL_APPROVE + encode(["address", "uint256"], [ROUTER, 0]).hex()
     assert check_tx(req(USDC, revoke), ME, ALLOW, LIMITS, killed=True) == []
+    # while killed: an exact approval to the router (for the exit swap) is fine, to the lending pool it is not
+    assert check_tx(req(USDC, good, declared_spend=100), ME, ALLOW, LIMITS, killed=True) == []
+    to_pool = SEL_APPROVE + encode(["address", "uint256"], [POOL, 100]).hex()
+    assert check_tx(req(USDC, to_pool, declared_spend=100), ME, ALLOW, LIMITS, killed=True)
 
 
 def test_transfers_only_when_killed_and_to_safe():

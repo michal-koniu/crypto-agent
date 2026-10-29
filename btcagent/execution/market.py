@@ -11,6 +11,8 @@ from datetime import datetime, timezone
 
 import ccxt
 
+from .. import faults
+
 from ..types import CostEstimate, Prices
 
 VENUE_FEES_BPS = {          # entry-tier taker fees (research A, checked 2026-10-29)
@@ -41,6 +43,8 @@ class Market:
 
     def prices(self, assets=("BTC", "ETH", "SOL")) -> Prices:
         """USD prices (USDC-quoted on OKX; USDC treated as 1.0 unless its own USDC/USDT quote says otherwise)."""
+        if faults.active().get("exchange_down"):
+            raise faults.InjectedFault("injected fault: exchange_down")
         p = self.ex[self.primary]
         usd = {"USDC": 1.0, "USDT": 1.0}
         tick = p.fetch_tickers([f"{a}/USDC" for a in assets] + ["USDC/USDT"])
@@ -59,13 +63,16 @@ class Market:
         return Prices(usd=usd, ts=datetime.now(timezone.utc), source=self.primary, second_source_btc_usd=second)
 
     def quote(self, symbol: str, side: str, qty_base: float, venue: str | None = None) -> Quote:
+        if faults.active().get("exchange_down"):
+            raise faults.InjectedFault("injected fault: exchange_down")
         ex = self.ex[venue or self.primary]
         ob = ex.fetch_order_book(symbol, limit=50)
         bid, ask = ob["bids"][0][0], ob["asks"][0][0]
         mid = (bid + ask) / 2
         levels = ob["asks"] if side == "buy" else ob["bids"]
         left, cost = qty_base, 0.0
-        for px, sz in levels:
+        for lvl in levels:                       # ccxt levels are [price, amount] or [price, amount, count]
+            px, sz = float(lvl[0]), float(lvl[1])
             take = min(left, sz)
             cost += take * px
             left -= take

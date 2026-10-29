@@ -23,9 +23,10 @@ def test_valid_trade_passes(ctx_factory):
     assert d.allowed, d.violations
 
 
-def test_oversized_order_fraction(ctx_factory):
-    d = check(trade(sell_qty=0.04), ctx_factory())
-    assert not d.allowed and any("of NAV" in v for v in d.violations)
+def test_full_exit_allowed_but_not_more_than_held(ctx_factory):
+    assert check(trade(sell_qty=0.04), ctx_factory()).allowed           # 80 % of NAV in one order is fine
+    d = check(trade(sell_qty=0.06), ctx_factory())
+    assert not d.allowed and any("exceeds holding" in v for v in d.violations)
 
 
 def test_oversized_order_usd(ctx_factory):

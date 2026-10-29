@@ -1,0 +1,50 @@
+# SOAK TEST config: decide every 60 min, 1 analyst sample, alerts to the ledger only, separate state dir.
+mode: paper
+executor: paper
+state_dir: ~/.local/state/btcagent-soak
+data_dir: ~/.local/share/btcagent/data
+models: config/models.yaml
+strategies: evolvable/strategies.yaml
+playbook: evolvable/playbook.yaml
+paper:
+  initial_deposit:
+    USDC: 100
+  lend_apy:
+    aave_v3_base: 0.05
+evm:
+  chain: base
+  rpc_url: http://127.0.0.1:8545
+  signer_port: 8790
+schedule:
+  risk_tick_seconds: 60
+  decision_utc: 00:30
+  data_refresh_hours: 20
+  review: weekly
+  review_weekday: 6
+  monthly_report_day: 1
+  heartbeat_minutes: 60
+  decision_interval_minutes: 60
+trading:
+  min_trade_nav_fraction: 0.05
+  stable: USDC
+  venue_pairs_note: 'paper mirrors OKX Europe: BTC/USDC'
+yield:
+  enabled: true
+  protocol: aave_v3_base
+  keep_liquid_fraction: 0.0
+  min_usd: 20
+  expected_apy: 0.05
+  lockup_hours: 0
+analyst:
+  enabled: true
+  samples: 1
+  critic: true
+news:
+  enabled: true
+  since_hours: 30
+alerts:
+  email_to: offlinelocalagents@gmail.com
+  email_enabled: false
+  telegram_enabled: false
+  min_interval_minutes: 30
+git_commit_changes: false

@@ -1,0 +1,19 @@
+# User service: the signer daemon (fork or live stages only; paper needs no signer).
+# The keystore password comes from the Bitwarden vault at start-up (bw-secret, see llm-private-education ch. 11);
+# it is never written to disk or to this file. CEX keys (trade-only, no withdrawal permission) likewise.
+[Unit]
+Description=btc-agent signer (holds keys, signs only what its own policy allows)
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Desktop/github_repos/btc-agent
+Environment=BTCAGENT_KEYSTORE_PASSWORD_CMD=bw-secret btc-agent#keystore-password
+ExecStart=%h/Desktop/github_repos/btc-agent/.venv/bin/btcagent signer --keystore %h/.local/state/btcagent/keystore.json --mode fork
+Restart=on-failure
+RestartSec=10
+MemoryMax=512M
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

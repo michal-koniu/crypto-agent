@@ -25,7 +25,7 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
-from .. import frozen
+from .. import faults, frozen
 from ..alerts import Alerts
 from ..data import features, history, news
 from ..improve import gatekeeper
@@ -55,6 +55,7 @@ class Agent:
         self.mode = self.cfg["mode"]
         self.state = expand(self.cfg["state_dir"])
         self.state.mkdir(parents=True, exist_ok=True)
+        faults.configure(self.state)
         self.data_dir = expand(self.cfg["data_dir"])
         self.ledger = Ledger(self.state / "ledger.db")
         self.router = Router(expand(self.cfg["models"]), ledger=self.ledger)
@@ -318,7 +319,9 @@ class Agent:
                "final_weights": {"stable": final_s, "eth": final_e}, "weights_before": w,
                "weights_after": pf_after.weights(prices), "nav_btc": pf_after.nav_btc(prices), "nav_usd": pf_after.nav_usd(prices),
                "btc_usd": prices.usd["BTC"], "actions": actions,
-               "action": "trade" if any(a.get("status") == "filled" for a in actions) else ("lend" if actions else "none")}
+               "action": ("trade" if any(a.get("status") == "filled" for a in actions)
+                          else "lend" if any("lend" in a for a in actions)
+                          else "attempted_failed" if actions else "none")}
         self.ledger.append("decision", rec)
         if analyst_rec:
             self.ledger.append("forecast", {"decision_id": did, "ts": now.isoformat(), "btc_usd": prices.usd["BTC"],
@@ -342,11 +345,14 @@ class Agent:
         panel, _ = self.panel()
         day = panel.loc[:pd.Timestamp(now.date()) - pd.Timedelta(days=1)].iloc[-1]
         self.loop.setup_shadows()
-        self.loop.shadows.on_day(str(day.name.date()), float(day["btc"]), float(day["eth_btc"]) if pd.notna(day.get("eth_btc")) else None,
-                                 float(day["ust3m"]) if pd.notna(day.get("ust3m")) else None)
-        self.loop.shadows.save()
-        if hasattr(self.executor, "accrue_interest"):
-            self.executor.accrue_interest(1.0)
+        up = self._load("upkeep.json", {"day": None})
+        if up["day"] != str(day.name.date()):          # once per market day, however often upkeep runs
+            self.loop.shadows.on_day(str(day.name.date()), float(day["btc"]), float(day["eth_btc"]) if pd.notna(day.get("eth_btc")) else None,
+                                     float(day["ust3m"]) if pd.notna(day.get("ust3m")) else None)
+            self.loop.shadows.save()
+            if hasattr(self.executor, "accrue_interest"):
+                self.executor.accrue_interest(1.0)
+            self._save("upkeep.json", {"day": str(day.name.date())})
         scored = self.score_forecasts(now)
         pms = self.run_postmortems()
         sched = self.cfg["schedule"]

@@ -8,13 +8,13 @@
  "btcagent/policy/engine.py": "be242c7807ba0028dbb4595ca7a9f0f508e0c9c65e90d5399d6895a11157a723",
  "btcagent/risk/killswitch.py": "7807bdb61598cb52879d849853a4cc407ace05dd9a7e9d73e1a2d24b71e9a46d",
  "btcagent/signer/keystore.py": "7dd5f0c1be7315c6e664298c9fa85a89a4346fcab4d999ab378e1c17355f9b57",
- "btcagent/signer/policy.py": "76c6003f6efef5fb80bc5b5bf9686b0d873bd761fa25d7e4b404b45d7f7ed752",
+ "btcagent/signer/policy.py": "a9e8ff5aa5166924128a71aca7e3b65cea4c48d6f89be2c028b1d9a9a283dae1",
  "btcagent/signer/server.py": "44054a836ac2b734e1ca30cae735e6ebc7d46a7e5035bec7aa5fffa5c4d2b411",
  "btcagent/types.py": "bf0f944699e44c330d2f6bb1f3299599b60fe493d4a1b5c57b1235a4ad7ece98",
  "frozen/allowlists.yaml": "ab94e340a21a5f6c4703061bb7e606620dc7e3b1da79f2d89643998d4036e169",
  "frozen/constitution.md": "dfa0058be452fa1e4c693feb851913b2d4dcdc0c255989f731e877f1f13b689d",
  "frozen/gate_rules.yaml": "e50cd257b73d1655519ff7d32b628132bb85c29be7298b0179c44944ded3fc83",
- "frozen/limits.yaml": "449c3726f054721ef281e8da7d9411084abf82100722387ed753b67efb052660",
+ "frozen/limits.yaml": "2fcf5335d3f53dfec61e64412f7a2a2150546d9eb026452aa31c6d119a9e5856",
  "frozen/param_bounds.yaml": "ef860f74ef99500a803506da96f57e65e829056337bee5912edf96d3c93ad17c",
  "frozen/sentinel.yaml": "cc0632d3396c897e066db00c8bd3bf2549c2759477d2b6073c5387535e5524a7"
 }

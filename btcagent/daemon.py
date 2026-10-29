@@ -63,11 +63,18 @@ def run(cfg_path=None, overrides=None, max_iterations: int | None = None):
         if time.time() - last["last_heartbeat"] >= sched["heartbeat_minutes"] * 60:
             agent.safe_call(agent.heartbeat, now)
             last["last_heartbeat"] = time.time()
-        due = (now.hour, now.minute) >= (hh, mm)
-        if due and last["last_decision_day"] != str(now.date()):
-            agent.safe_call(agent.daily_upkeep, now)
-            agent.safe_call(agent.decide, now)
-            last["last_decision_day"] = str(now.date())
+        every = sched.get("decision_interval_minutes")     # soak tests: decide every N minutes instead of daily
+        if every:
+            if time.time() - last.get("last_decision_ts", 0) >= every * 60:
+                agent.safe_call(agent.daily_upkeep, now, review=False)
+                agent.safe_call(agent.decide, now)
+                last["last_decision_ts"] = time.time()
+        else:
+            due = (now.hour, now.minute) >= (hh, mm)
+            if due and last["last_decision_day"] != str(now.date()):
+                agent.safe_call(agent.daily_upkeep, now)
+                agent.safe_call(agent.decide, now)
+                last["last_decision_day"] = str(now.date())
         agent._save("daemon.json", last)
         for _ in range(int(sched["risk_tick_seconds"])):
             if not RUNNING:

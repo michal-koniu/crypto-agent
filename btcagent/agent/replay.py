@@ -39,7 +39,7 @@ def make_agent(state_dir: Path, start: str, overrides: dict | None = None, depos
 
 
 def run(agent: Agent, start: str, end: str, step_days: int = 7, decide: bool = True, upkeep: bool = True,
-        on_step=None) -> list[dict]:
+        on_step=None, review: bool = False) -> list[dict]:
     out = []
     d = pd.Timestamp(start)
     while d <= pd.Timestamp(end):
@@ -48,7 +48,7 @@ def run(agent: Agent, start: str, end: str, step_days: int = 7, decide: bool = T
         agent.ledger.clock = lambda now=now: now.isoformat(timespec="microseconds")
         agent.market.set_date(d - pd.Timedelta(days=1))           # decisions use yesterday's close
         tick = agent.safe_call(agent.risk_tick, now)
-        up = agent.safe_call(agent.daily_upkeep, now, review=(d.weekday() == 0)) if upkeep else None
+        up = agent.safe_call(agent.daily_upkeep, now, review=review) if upkeep else None
         dec = agent.safe_call(agent.decide, now) if decide else None
         rec = {"date": str(d.date()), "tick": tick, "upkeep": up,
                "decision": {k: (dec or {}).get(k) for k in ("action", "final_weights", "nav_btc", "nav_usd", "strategy_version")}}

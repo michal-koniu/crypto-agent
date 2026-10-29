@@ -26,6 +26,7 @@ import httpx
 import yaml
 from pydantic import BaseModel, ValidationError
 
+from .. import faults
 from ..ledger.store import Ledger
 
 ENV_RE = re.compile(r"\$\{([A-Z0-9_]+)(?::-([^}]*))?\}")
@@ -169,6 +170,8 @@ class Router:
             for attempt in range(retries + 1):
                 t0 = time.time()
                 try:
+                    if provider in (faults.active().get("llm_down") or []):
+                        raise LLMError(f"injected fault: provider {provider} down")
                     fn = self._call_anthropic if prov["kind"] == "anthropic" else self._call_openai
                     text, served, tin, tout = fn(prov, model, system, msg_user, schema, rc)
                     usd = self._account(role, provider, tin, tout)
