@@ -82,13 +82,14 @@ roles:
     max_tokens: 20000
     timeout_s: 1200
     samples: 3
-  triage:         # classifies a losing trade / failure into a fixed taxonomy (post-mortem step 1)
-    model: rig:qwen3.6-35b-a3b
-    fallbacks: [rig:qwen3.8-flash-next, rig:gemma-4-26b-a4b]
-    temperature: 0.0
-    max_tokens: 1500
-    timeout_s: 300
-    extra_body: {chat_template_kwargs: {enable_thinking: false}}
+  triage:         # classifies a losing trade / failure into a fixed taxonomy (post-mortem step 1). Rare (a few per
+                  # year) and it decides whether a lesson is stored, so it gets the strongest model with reasoning on.
+                  # (qwen3.6 without thinking labelled a textbook tight-stop whipsaw as "exogenous_shock" in testing.)
+    model: rig:qwen3.8-flash-next
+    fallbacks: [rig:qwen3.6-35b-a3b, rig:gemma-4-26b-a4b]
+    temperature: 0.2
+    max_tokens: 12000
+    timeout_s: 900
 
 budgets:
   per_role_daily_tokens: {analyst: 400000, critic: 150000, reader: 300000, reflector: 300000, triage: 100000}

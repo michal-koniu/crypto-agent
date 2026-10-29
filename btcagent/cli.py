@@ -50,6 +50,11 @@ def main(argv=None):
     ks = sub.add_parser("keystore", help="create an encrypted keystore (prints only the address)")
     ks.add_argument("path")
     rv = sub.add_parser("review", help="ask for a reflection now (human request trigger)")
+    pp = sub.add_parser("propose", help="submit a human proposal; it goes through the same gates, shadow and probation")
+    pp.add_argument("--target", required=True, help="e.g. cycle_guard.max_days_in_stable")
+    pp.add_argument("--value", required=True)
+    pp.add_argument("--hypothesis", required=True)
+    pp.add_argument("--evidence", nargs="*", default=["human research"])
     rc = sub.add_parser("risk-check", help="token/contract risk report before allowlisting (GoPlus, on-chain code)")
     rc.add_argument("address")
     rc.add_argument("--chain-id", default="8453")
@@ -150,6 +155,15 @@ def main(argv=None):
         now = datetime.now(timezone.utc)
         panel, feat = agent.panel()
         print(json.dumps(agent.loop.propose_and_gate(now, feat, panel, {"human_request"}), indent=1, default=str)[:20000])
+    elif args.cmd == "propose":
+        from datetime import datetime, timezone
+        from .llm.schemas import Proposal
+        val = float(args.value) if args.value.replace(".", "", 1).isdigit() else args.value
+        prop = Proposal(op="PARAM_CHANGE", target=args.target, new_value=int(val) if isinstance(val, float) and val.is_integer() else val,
+                        hypothesis=args.hypothesis, evidence=args.evidence, predicted_effect={"metric": "btc_multiple", "direction": "up"})
+        panel, feat = agent.panel()
+        print(json.dumps(agent.loop.propose_and_gate(datetime.now(timezone.utc), feat, panel, {"human_request"}, forced=prop),
+                         indent=1, default=str)[:20000])
     elif args.cmd == "state":
         agent.loop.ctrl.set_state(args.to, args.why)
         agent.loop.ctrl.save()

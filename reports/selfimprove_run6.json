@@ -1,0 +1,105 @@
+{
+ "started": "2026-10-29T19:04:32.104311+00:00",
+ "state_dir": "/tmp/btcagent-selfimprove-1793300672",
+ "phases": {
+  "1_losses_postmortem_lessons": {
+   "fills": 4,
+   "postmortems": [
+    {
+     "failure_class": "stop_too_tight",
+     "confidence": 0.62,
+     "lesson": "Backtest a STABLE stop/re-entry guard that suppresses strategy re-entries after a stop when alt_gate is risk-off or exit_50w is true, or requires a reclaim of the stop/exit level for reclaim_weeks, and measure whether it reduces post-re-entry min_vs_exit drawdowns without materially reducing winning",
+     "model": "rig:qwen3.8-flash-next",
+     "trip": "STABLE:2020-01-12->2020-01-26"
+    },
+    {
+     "failure_class": "regime_misread",
+     "confidence": 0.78,
+     "lesson": "Backtest a re-entry confirmation gate after exit_50w/risk-off exits: require price above the 50-week MA for reclaim_weeks and alt_gate unblocked before re-entering, and test whether this reduces whipsaw losses in historical cases where post-reentry min_vs_exit is positive.",
+     "model": "rig:qwen3.8-flash-next",
+     "trip": "STABLE:2020-03-22->2020-04-12"
+    }
+   ],
+   "lessons_added": [
+    {
+     "added": "2026-10-29",
+     "added_in": 2,
+     "harmful": 0,
+     "helpful": 0,
+     "id": "L-001",
+     "last_used": null,
+     "provenance": [
+      "a89c5ecd-de9a-4f7c-bd8b-4dc547c0c38d",
+      "07368092-4cb0-4ebd-aee1-066607efc354",
+      "133b9866-d23f-4481-ac59-6e06cf6ab815",
+      "d8c92173-fbf2-4d2d-ab9d-2f45b3bb7ede"
+     ],
+     "tags": [
+      "stop_width",
+      "reentry_filter",
+      "regime_gate"
+     ],
+     "text": "Backtest a STABLE stop/re-entry guard that suppresses strategy re-entries after a stop when alt_gate is risk-off or exit_50w is true, or requires a reclaim of the stop/exit level for reclaim_weeks, and measure whether it reduces post-re-entry min_vs_exit drawdowns without materially reducing winning"
+    },
+    {
+     "added": "2026-10-29",
+     "added_in": 3,
+     "harmful": 0,
+     "helpful": 0,
+     "id": "L-002",
+     "last_used": null,
+     "provenance": [
+      "0375bffd-b965-41eb-b8d9-d0a74e2bd5b1"
+     ],
+     "tags": [
+      "regime_gate",
+      "reentry_confirmation",
+      "whipsaw_reduction"
+     ],
+     "text": "Backtest a re-entry confirmation gate after exit_50w/risk-off exits: require price above the 50-week MA for reclaim_weeks and alt_gate unblocked before re-entering, and test whether this reduces whipsaw losses in historical cases where post-reentry min_vs_exit is positive."
+    }
+   ],
+   "triage_models_served": [
+    "qwen3.8-flash-next"
+   ],
+   "passed": true,
+   "automatic_kill_events": [],
+   "phase_1b_tight_stop": {
+    "postmortems": [
+     {
+      "failure_class": "stop_too_tight",
+      "confidence": 0.82,
+      "lesson": "In risk-off / below-50w regimes, stop-loss re-entries should require a volatility-scaled reclaim buffer above the stop exit, not just a fixed 5% stop, to avoid whipsaw re-entry at higher prices.",
+      "trip": "STABLE:2022-01-16->2022-04-03"
+     }
+    ],
+    "lessons_added": [
+     {
+      "added": "2026-10-29",
+      "added_in": 2,
+      "harmful": 0,
+      "helpful": 0,
+      "id": "L-001",
+      "last_used": null,
+      "provenance": [
+       "289b3436-c46b-4832-9c9f-2c26c1538c52",
+       "3d277bf1-ee08-4071-8865-6fd82514f8b9",
+       "74c2815e-3cd1-493e-a697-9501b24a675e",
+       "1f09a336-e070-46d5-b644-24e162812df1",
+       "8dacd787-eba0-41f9-8c2d-3575e099cd56",
+       "9a36505b-ad3b-48c3-9c27-d9713059708c"
+      ],
+      "tags": [
+       "stop_width",
+       "reentry_filter",
+       "regime_gate"
+      ],
+      "text": "In risk-off / below-50w regimes, stop-loss re-entries should require a volatility-scaled reclaim buffer above the stop exit, not just a fixed 5% stop, to avoid whipsaw re-entry at higher prices."
+     }
+    ],
+    "lesson_rejected": []
+   },
+   "lesson_stored": true
+  }
+ }
+}

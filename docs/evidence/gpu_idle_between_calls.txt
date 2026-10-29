@@ -1,0 +1,9 @@
+Thu Oct 29 06:35:32 PM UTC 2026
+GPU: 0	        GFX_ACTIVITY: 4 %	        USED_VRAM: 31047 MB
+GPU: 1	        GFX_ACTIVITY: 4 %	        USED_VRAM: 30290 MB
+GPU: 2	        GFX_ACTIVITY: 8 %	        USED_VRAM: 30270 MB
+GPU: 3	        GFX_ACTIVITY: 5 %	        USED_VRAM: 30270 MB
+GPU: 4	        USED_VRAM: 305 MB	
+               total        used        free      shared  buff/cache   available
+Mem:              60          38           0           1          22          22
+loaded: ['qwen3.6-35b-a3b', 'qwen3.8-flash-next']

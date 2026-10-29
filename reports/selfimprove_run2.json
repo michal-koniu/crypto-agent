@@ -1,0 +1,70 @@
+{
+ "started": "2026-10-29T18:50:10.139650+00:00",
+ "state_dir": "/tmp/btcagent-selfimprove-1793299810",
+ "phases": {
+  "1_losses_postmortem_lessons": {
+   "fills": 2,
+   "postmortems": [
+    {
+     "failure_class": "noise",
+     "confidence": 0.85,
+     "lesson": "Implement a minimum holding period or volatility filter for re-entries in 'STABLE' regimes to avoid being whipsawed by short-term mean reversion within the strategy's defined noise band.",
+     "model": "rig:qwen3.6-35b-a3b",
+     "trip": "STABLE:2020-01-12->2020-01-26"
+    }
+   ],
+   "lessons_added": [],
+   "triage_models_served": [
+    "qwen3.6-35b-a3b"
+   ],
+   "passed": true
+  },
+  "2_live_reflection_and_gates": {
+   "reflection_samples": [
+    {
+     "op": "NONE",
+     "target": "champion",
+     "new_value": null,
+     "hypothesis": "No parameter change is warranted in BOOTSTRAP with no live NAV, no postmortem classes, and no scored forecasts; the champion and sentinel match, and the current shadow underperformance vs BTC alone is insufficient evidence of a defect.",
+     "predicted_effect": {
+      "direction": "no_change",
+      "metric": "live_nav_btc_recent",
+      "size": 0.0
+     }
+    },
+    {
+     "op": "NONE",
+     "target": "",
+     "new_value": null,
+     "hypothesis": "No change is warranted yet: the champion is in BOOTSTRAP with no live NAV, no postmortems, no scored forecasts, and shadow results identical to the sentinel. There is no falsifiable evidence that any parameter is wrong.",
+     "predicted_effect": {
+      "direction": "unchanged",
+      "metric": "shadow_nav_btc",
+      "size": "0"
+     }
+    },
+    {
+     "op": "NONE",
+     "target": "champion",
+     "new_value": null,
+     "hypothesis": "No single parameter or playbook change is currently justified; the champion matches the sentinel, live NAV is unavailable, and there are no postmortems, scored forecasts, or rejected-idea signals to isolate a failure class.",
+     "predicted_effect": {
+      "direction": "neutral",
+      "metric": "live_nav_btc_recent",
+      "size": 0
+     }
+    }
+   ],
+   "votes": {
+    "('NONE', '', 'None')": 1,
+    "('NONE', 'champion', 'None')": 2
+   },
+   "result": "no_proposal",
+   "detail": "",
+   "reflector_models": [
+    "qwen3.8-flash-next"
+   ],
+   "passed": true
+  }
+ }
+}

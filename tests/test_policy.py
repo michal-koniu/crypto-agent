@@ -102,9 +102,19 @@ def test_daily_loss_halts_new_risk(ctx_factory):
     assert not d.allowed and d.halt and any("daily loss" in v for v in d.violations)
 
 
-def test_drawdown_triggers_kill(ctx_factory):
-    d = check(trade(), ctx_factory(nav_btc_peak=0.075))
-    assert d.kill and any("drawdown" in v for v in d.violations)
+def test_realised_btc_drawdown_triggers_kill(ctx_factory):
+    d = check(trade(), ctx_factory(nav_btc_rest_peak=0.075, at_rest=True))      # 0.05 vs 0.075 BTC at rest: -33 %
+    assert d.kill and any("realised BTC drawdown" in v for v in d.violations)
+
+
+def test_mark_to_market_swing_in_stables_does_not_kill(ctx_factory):
+    d = check(trade(), ctx_factory(nav_btc_peak=0.075, nav_btc_rest_peak=0.075, at_rest=False))
+    assert not d.kill
+
+
+def test_usd_drawdown_halts_but_does_not_kill(ctx_factory):
+    d = check(trade(), ctx_factory(nav_usd_peak=20000.0))                       # NAV ~$4000 vs $20k peak
+    assert d.halt and not d.kill and any("USD drawdown" in v for v in d.violations)
 
 
 def test_halted_allows_only_exit_to_btc(ctx_factory):

@@ -120,6 +120,8 @@ class Agent:
                              halted=killswitch.is_halted(self.state) if self.mode != "replay" else self._load("replay_halt.json", {}).get("day") == str(now.date()),
                              killed=killswitch.is_killed(self.state), nav_btc_day_start=r.get("nav_btc_day_start"),
                              nav_btc_peak=r.get("nav_btc_peak"), nav_usd_peak=r.get("nav_usd_peak"),
+                             nav_btc_rest_peak=r.get("nav_btc_rest_peak"),
+                             at_rest=pf.weights(prices).get("BTC", 0.0) >= 0.95,
                              recent_order_times=times, last_trade_time_by_asset=last_by_asset)
 
     def update_risk_marks(self, pf: Portfolio, prices: Prices, now: datetime) -> dict:
@@ -129,6 +131,9 @@ class Agent:
         if r.get("day") != day:
             r["day"], r["nav_btc_day_start"] = day, nb
         r["nav_btc_peak"] = max(r.get("nav_btc_peak") or 0.0, nb)
+        r["at_rest"] = pf.weights(prices).get("BTC", 0.0) >= 0.95
+        if r["at_rest"]:
+            r["nav_btc_rest_peak"] = max(r.get("nav_btc_rest_peak") or 0.0, nb)
         r["nav_usd_peak"] = max(r.get("nav_usd_peak") or 0.0, nu)
         r["nav_btc"], r["nav_usd"], r["ts"] = nb, nu, now.isoformat()
         self._save("risk.json", r)
@@ -354,7 +359,7 @@ class Agent:
                 self.executor.accrue_interest(1.0)
             self._save("upkeep.json", {"day": str(day.name.date())})
         scored = self.score_forecasts(now)
-        pms = self.run_postmortems()
+        pms = self.run_postmortems(now)
         sched = self.cfg["schedule"]
         if review is None:
             review = (sched["review"] == "daily" or (sched["review"] == "weekly" and now.weekday() == sched["review_weekday"])
@@ -395,8 +400,11 @@ class Agent:
             pb.save()
         return n
 
-    def run_postmortems(self) -> list:
-        """Post-mortem every closed round trip of the real (paper/fork/live) book that lost BTC, once."""
+    def run_postmortems(self, now: datetime | None = None) -> list:
+        """Post-mortem every closed round trip of the real (paper/fork/live) book that lost BTC, once, after a
+        delay (default 56 days) so that what happened next is a verified outcome, not a guess (course rule 8)."""
+        now = now or self.clock()
+        delay = int(self.cfg.get("postmortem_delay_days", 56))
         fills = self.ledger.events(kind="fill")
         trades = []
         for e in fills:
@@ -407,18 +415,32 @@ class Agent:
             side = "buy" if p["sell_asset"] == "BTC" else "sell"
             trades.append({"date": e.ts[:10], "leg": leg, "side": side, "btc_usd": p.get("price_btc_usd"),
                            "eth_btc": None, "fee_btc": p.get("fee_usd", 0) / (p.get("price_btc_usd") or 1), "fill_id": e.id,
-                           "decision_id": p.get("decision_id")})
+                           "decision_id": p.get("decision_id"), "reason": p.get("reason_code"),
+                           "strategy_version": p.get("strategy_version")})
         done = {e.payload.get("trip", {}).get("id") for e in self.ledger.events(kind="postmortem")}
         out = []
         pb = Playbook(self.playbook_path)
+        panel, _ = self.panel()
+        strategies = gatekeeper.load_strategies(self.strategies_path)
         for trip in losing_trips(trades):
-            if trip["id"] in done:
+            if trip["id"] in done or now.date() < (pd.Timestamp(trip["close"]) + pd.Timedelta(days=delay)).date():
                 continue
+            o = next(t for t in trades if t["date"] == trip["open"] and t["leg"] == trip["leg"] and t["side"] == "buy")
+            c = next(t for t in trades if t["date"] == trip["close"] and t["leg"] == trip["leg"] and t["side"] == "sell")
+            name = (o.get("strategy_version") or "").split("@")[0]
+            params = (strategies["strategies"].get(name) or (strategies.get("archive") or {}).get(name, {}).get("params") or {}).get("cycle_guard", {})
+            after = panel["btc"].loc[pd.Timestamp(trip["close"]): pd.Timestamp(trip["close"]) + pd.Timedelta(days=delay)]
             decisions = [e for e in self.ledger.events(kind="decision") if trip["open"] <= e.ts[:10] <= trip["close"]]
             ctx = {"decision_ids": [e.id for e in decisions][:10],
+                   "exit_btc_usd": o["btc_usd"], "reentry_btc_usd": c["btc_usd"], "reentry_reason": c.get("reason"),
+                   "strategy_version": o.get("strategy_version"),
+                   "params_in_force": {k: params.get(k) for k in ("stable_stop_btc_pct", "reclaim_weeks", "exit_weeks_below_50w", "max_days_in_stable")},
+                   "after_reentry_8w": {"min_vs_reentry": round(float(after.min() / c["btc_usd"] - 1), 4) if len(after) else None,
+                                        "max_vs_reentry": round(float(after.max() / c["btc_usd"] - 1), 4) if len(after) else None,
+                                        "last_vs_reentry": round(float(after.iloc[-1] / c["btc_usd"] - 1), 4) if len(after) else None,
+                                        "min_vs_exit": round(float(after.min() / o["btc_usd"] - 1), 4) if len(after) else None},
                    "rule_states_at_open": decisions[0].payload.get("rule_states") if decisions else None,
-                   "analyst_at_open": (decisions[0].payload.get("analyst") or {}).get("key_factors") if decisions else None,
-                   "btc_path_usd": [e.payload.get("btc_usd") for e in decisions][:60]}
+                   "analyst_at_open": (decisions[0].payload.get("analyst") or {}).get("key_factors") if decisions else None}
             out.append(postmortem(trip, ctx, self.router, self.ledger, pb))
         return out
 

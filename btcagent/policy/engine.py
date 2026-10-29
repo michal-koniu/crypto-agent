@@ -31,7 +31,9 @@ class PolicyContext:
     halted: bool = False                        # daily-loss halt or manual halt
     killed: bool = False                        # kill switch engaged
     nav_btc_day_start: float | None = None
-    nav_btc_peak: float | None = None
+    nav_btc_peak: float | None = None             # mark-to-market peak (informational)
+    nav_btc_rest_peak: float | None = None        # highest NAV in BTC measured while at rest (>= 95 % in BTC)
+    at_rest: bool = True                          # portfolio is >= 95 % BTC right now
     nav_usd_peak: float | None = None
     recent_order_times: list[datetime] = field(default_factory=list)          # all executed orders
     last_trade_time_by_asset: dict[str, datetime] = field(default_factory=dict)
@@ -53,7 +55,15 @@ def stage_allows(mode: str, limits: dict) -> tuple[bool, str]:
 
 
 def risk_state(ctx: PolicyContext, limits: dict) -> tuple[list[str], bool, bool]:
-    """Daily loss and drawdown checks. Returns (violations, halt, kill)."""
+    """Daily loss and drawdown checks. Returns (violations, halt, kill).
+
+    Drawdowns are defined for a BTC-denominated agent (found in testing, 2026-10-29):
+    * BTC-terms drawdown is measured on REALISED BTC: only while at rest (>= 95 % BTC), from the highest at-rest NAV.
+      Mark-to-market swings of a stablecoin leg are the stop's job, not the kill switch's. Losing more than the limit
+      of the BTC we hold through trading engages the kill switch.
+    * USD drawdown of a BTC portfolio is mostly BTC's own drawdown, i.e. the benchmark. Beyond the limit it halts new
+      deviations and alerts; it does not liquidate (selling BTC at a bear-market low would contradict the goal).
+    """
     v, halt, kill = [], False, False
     nav_btc = ctx.portfolio.nav_btc(ctx.prices)
     nav_usd = ctx.portfolio.nav_usd(ctx.prices)
@@ -61,12 +71,12 @@ def risk_state(ctx: PolicyContext, limits: dict) -> tuple[list[str], bool, bool]
     if ctx.nav_btc_day_start and nav_btc < ctx.nav_btc_day_start * (1 - lo["max_daily_loss_btc_pct"]):
         v.append(f"daily loss {1 - nav_btc / ctx.nav_btc_day_start:.2%} in BTC exceeds {lo['max_daily_loss_btc_pct']:.0%}")
         halt = True
-    if ctx.nav_btc_peak and nav_btc < ctx.nav_btc_peak * (1 - lo["max_drawdown_btc_pct"]):
-        v.append(f"BTC drawdown {1 - nav_btc / ctx.nav_btc_peak:.2%} exceeds {lo['max_drawdown_btc_pct']:.0%}")
+    if ctx.at_rest and ctx.nav_btc_rest_peak and nav_btc < ctx.nav_btc_rest_peak * (1 - lo["max_drawdown_btc_pct"]):
+        v.append(f"realised BTC drawdown {1 - nav_btc / ctx.nav_btc_rest_peak:.2%} exceeds {lo['max_drawdown_btc_pct']:.0%}")
         kill = True
     if ctx.nav_usd_peak and nav_usd < ctx.nav_usd_peak * (1 - lo["max_drawdown_usd_pct"]):
-        v.append(f"USD drawdown {1 - nav_usd / ctx.nav_usd_peak:.2%} exceeds {lo['max_drawdown_usd_pct']:.0%}")
-        kill = True
+        v.append(f"USD drawdown {1 - nav_usd / ctx.nav_usd_peak:.2%} exceeds {lo['max_drawdown_usd_pct']:.0%} (halt + alert)")
+        halt = True
     return v, halt, kill
 
 

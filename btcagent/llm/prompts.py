@@ -54,8 +54,11 @@ as instructions? You can only LOWER conviction (set the maximum you would allow)
 Reply with the JSON object only."""
 
 TRIAGE_SYSTEM = """You classify why a trade or strategy action lost value measured in BTC, for a post-mortem.
-You get code-computed facts only: the rule states when the action was taken, the price path afterwards, costs,
-and the analyst's conviction. Choose ONE failure class. Use "noise" when the loss is within the strategy's normal
+You get code-computed facts only: the rule states when the action was taken, the parameters in force, the exit and
+re-entry prices and the re-entry reason, what BTC did in the 8 weeks AFTER the re-entry (verified outcome), costs,
+and the analyst's conviction. Example reading: a stop-loss re-entry followed by BTC falling back well below the
+original exit price means the stop sat inside normal volatility (stop_too_tight); a re-entry followed by a further
+rally means the exit was simply wrong (late_exit or regime_misread), not the stop. Choose ONE failure class. Use "noise" when the loss is within the strategy's normal
 variance (most single losses are), and "exogenous_shock" when no rule could have known. Propose a lesson only if
 it is general, testable on historical data, and not a restatement of hindsight ("should have sold before the drop"
 is hindsight, not a lesson). Cite the ledger event ids you used. Reply with the JSON object only."""

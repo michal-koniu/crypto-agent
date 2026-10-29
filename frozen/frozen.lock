@@ -5,7 +5,7 @@
  "btcagent/improve/stats.py": "9bdc16bf66e3b8b9b0266b0b9c97eb5b96fc9d5354946edb8f571ee279d50a5a",
  "btcagent/ledger/store.py": "722499a6da660642f36665468a3a376b131212a8f226cf98beb3d91f9bf65378",
  "btcagent/ledger/tax.py": "821a122fd07c7977334ae7da4bb4321d45e882cc1a5984348d36887dfbd483b7",
- "btcagent/policy/engine.py": "be242c7807ba0028dbb4595ca7a9f0f508e0c9c65e90d5399d6895a11157a723",
+ "btcagent/policy/engine.py": "4109dd8ff644fee59d4d6a0940419c3bb213beca0748aee0a198743d25fff98d",
  "btcagent/risk/killswitch.py": "7807bdb61598cb52879d849853a4cc407ace05dd9a7e9d73e1a2d24b71e9a46d",
  "btcagent/signer/keystore.py": "7dd5f0c1be7315c6e664298c9fa85a89a4346fcab4d999ab378e1c17355f9b57",
  "btcagent/signer/policy.py": "a9e8ff5aa5166924128a71aca7e3b65cea4c48d6f89be2c028b1d9a9a283dae1",
@@ -14,7 +14,7 @@
  "frozen/allowlists.yaml": "ab94e340a21a5f6c4703061bb7e606620dc7e3b1da79f2d89643998d4036e169",
  "frozen/constitution.md": "dfa0058be452fa1e4c693feb851913b2d4dcdc0c255989f731e877f1f13b689d",
  "frozen/gate_rules.yaml": "e50cd257b73d1655519ff7d32b628132bb85c29be7298b0179c44944ded3fc83",
- "frozen/limits.yaml": "2fcf5335d3f53dfec61e64412f7a2a2150546d9eb026452aa31c6d119a9e5856",
+ "frozen/limits.yaml": "d8ff467131429bcd87afdaca714ebc4a390c6907f535ef06137253ec3e2c6509",
  "frozen/param_bounds.yaml": "ef860f74ef99500a803506da96f57e65e829056337bee5912edf96d3c93ad17c",
  "frozen/sentinel.yaml": "cc0632d3396c897e066db00c8bd3bf2549c2759477d2b6073c5387535e5524a7"
 }

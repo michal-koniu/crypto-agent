@@ -89,3 +89,38 @@ as a hypothesis for the self-improvement loop, not adopted - adopting it now wou
 
 Only the gates: a typed proposal that beats the champion over the full history, per cycle, in every stress window,
 then survives 4–12 weeks of shadow and 12 weeks of probation. Or the human, by editing the frozen files.
+
+## 7. A finding made during testing: the time limit in stables (post-hoc - read with care)
+
+While building the self-improvement test (2026-10-29) a scan of single-parameter changes showed that the champion is
+far from optimal on one axis: `cycle_guard.max_days_in_stable` (forced re-entry after N days out of BTC). The trades
+were audited (no bug): a forced re-entry ~6–8 months after the 50W exit lands near each bear-market low, which is
+Cowen's **verified** cycle clock (tops→bottoms 364–406 days; research E §2.5).
+`reports/robustness_max_days_in_stable.json` (all other params = champion):
+
+| days | 120 | 150 | 180 | 210 | 240 | 270 | 300 | 365 | 450 (champion) |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| BTC multiple 2011–2026 | 3.65 | 3.81 | 6.12 | 8.61 | 8.82 | 5.25 | 3.14 | 2.12 | 1.55 |
+
+A broad plateau, not a spike; 180–270 days win every halving cycle. **But** it was found after the champion was fixed,
+on the same ~4 cycles: it is data snooping until forward evidence accumulates. The process response:
+
+* **210 days** (the a-priori centre: the 50W-exit→low gaps were ~145/195/205/219 days) was submitted to the paper
+  agent as a human proposal and **rejected by the gatekeeper**: it wins every cycle (bootstrap p = 0.003, DSR 0.69)
+  but fails the 2017–18 must-pass window (re-enters at ~$3.9k before the final December 2018 low; −15 % vs the
+  champion at the window end, limit −10 %). The gate is conservative by design; it was **not** loosened to let a
+  favoured idea through.
+* **240 days** passes every gate (8.82×, bootstrap p = 0.001, equal or better in all five stress windows). It was
+  checked *after* the 210 rejection, so it is selected evidence; it is used in the self-improvement test to exercise
+  the promotion path, and is **not** submitted to the paper agent. Whether to propose it is the owner's decision:
+  `btcagent propose --target cycle_guard.max_days_in_stable --value 240 --hypothesis "..."` - it would then still
+  need 4–12 weeks of shadow and 12 weeks of probation.
+* A second finding while testing: **the re-entry ladder never fires** in `cycle_guard_v2`. It requires the exit signal
+  to be off, but the exit signal (≥2 weekly closes below the 50W) stays on for the whole time BTC is below the 50W,
+  i.e. exactly when the ladder conditions (price ≤ 200W / realised price, MVRV ≤ 1) can hold. That is why V1 and V2
+  in §3 are identical. The validated results above are therefore results *without* a ladder. Making the ladder
+  reachable (e.g. "not a fresh exit this week" instead of "exit signal off") is a strategy change and must go through
+  the gates like any other proposal; it has not been tested yet.
+* Risk if adopted: a time-based re-entry is a bet that bear markets keep their ~1-year length. If a bear market
+  lasts much longer (as in 2014–15, which bottomed ~400 days after the 2013 top but chopped for another year), the
+  re-entry happens too early and the 20 % stop does not help (it protects the other direction).

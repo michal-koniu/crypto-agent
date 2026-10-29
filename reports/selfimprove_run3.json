@@ -1,0 +1,70 @@
+{
+ "started": "2026-10-29T18:51:35.283513+00:00",
+ "state_dir": "/tmp/btcagent-selfimprove-1793299895",
+ "phases": {
+  "1_losses_postmortem_lessons": {
+   "fills": 2,
+   "postmortems": [
+    {
+     "failure_class": "noise",
+     "confidence": 0.95,
+     "lesson": "None",
+     "model": "rig:qwen3.6-35b-a3b",
+     "trip": "STABLE:2020-01-12->2020-01-26"
+    }
+   ],
+   "lessons_added": [],
+   "triage_models_served": [
+    "qwen3.6-35b-a3b"
+   ],
+   "passed": true
+  },
+  "2_live_reflection_and_gates": {
+   "reflection_samples": [
+    {
+     "op": "NONE",
+     "target": "",
+     "new_value": null,
+     "hypothesis": "No change is warranted yet.",
+     "predicted_effect": {
+      "direction": null,
+      "metric": null,
+      "size": null
+     }
+    },
+    {
+     "op": "NONE",
+     "target": "strategy",
+     "new_value": null,
+     "hypothesis": "No change is warranted: the champion matches the sentinel in shadow, live performance is unavailable, and there are no postmortems, scored forecasts, or rejected ideas indicating a specific defect.",
+     "predicted_effect": {
+      "direction": "none",
+      "metric": "none",
+      "size": 0
+     }
+    },
+    {
+     "op": "NONE",
+     "target": "",
+     "new_value": null,
+     "hypothesis": "No change is justified because there is no live failure evidence, no post-mortem signal, and no scored forecast error; the identical champion and sentinel shadow NAVs indicate the current cycle_guard_v2 logic is behaving as pinned, despite underperforming HODL in shadow.",
+     "predicted_effect": {
+      "direction": "unchanged",
+      "metric": "shadow_nav_btc",
+      "size": 0.0
+     }
+    }
+   ],
+   "votes": {
+    "('NONE', '', 'None')": 2,
+    "('NONE', 'strategy', 'None')": 1
+   },
+   "result": "no_proposal",
+   "detail": "",
+   "reflector_models": [
+    "qwen3.8-flash-next"
+   ],
+   "passed": true
+  }
+ }
+}

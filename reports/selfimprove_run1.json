@@ -1,0 +1,75 @@
+{
+ "started": "2026-10-29T18:44:14.839655+00:00",
+ "state_dir": "/tmp/btcagent-selfimprove-1793299454",
+ "phases": {
+  "1_losses_postmortem_lessons": {
+   "fills": 3,
+   "postmortems": [
+    {
+     "failure_class": "noise",
+     "confidence": 0.95,
+     "lesson": null,
+     "model": "rig:qwen3.6-35b-a3b",
+     "trip": "STABLE:2022-01-16->2022-04-03"
+    }
+   ],
+   "lessons_added": [],
+   "triage_models_served": [
+    "qwen3.6-35b-a3b"
+   ],
+   "passed": true
+  },
+  "2_live_reflection_and_gates": {
+   "reflection_samples": [
+    {
+     "op": "NONE",
+     "target": "champion",
+     "new_value": null,
+     "hypothesis": "No change is warranted because the champion is outperforming both the sentinel and HODL in shadow NAV, with no postmortem failures, live degradation, or scored forecast errors indicating a defect.",
+     "predicted_effect": {
+      "direction": "neutral",
+      "falsification": "If future live_nav_btc_recent or postmortem_classes show underperformance or failure classes, revisit.",
+      "metric": "shadow_nav_btc",
+      "size_bps": 0,
+      "size_range_bps": [
+       0,
+       0
+      ]
+     }
+    },
+    {
+     "op": "NONE",
+     "target": "champion",
+     "new_value": null,
+     "hypothesis": "No change is warranted because the champion currently outperforms both the sentinel and HODL in shadow BTC-denominated NAV, with no postmortem failures or scored forecast miscalibration indicating a defect.",
+     "predicted_effect": {
+      "direction": "neutral",
+      "metric": "shadow_nav_btc",
+      "size_bps": 0,
+      "size_range_bps": [
+       0,
+       0
+      ]
+     }
+    },
+    {
+     "op": "NONE",
+     "target": "",
+     "new_value": null,
+     "hypothesis": "",
+     "predicted_effect": {}
+    }
+   ],
+   "votes": {
+    "('NONE', '', 'None')": 1,
+    "('NONE', 'champion', 'None')": 2
+   },
+   "result": "no_proposal",
+   "detail": "",
+   "reflector_models": [
+    "qwen3.8-flash-next"
+   ],
+   "passed": true
+  }
+ }
+}

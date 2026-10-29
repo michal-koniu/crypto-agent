@@ -167,3 +167,34 @@ def test_kill_switch_procedure_on_fork(env, tmp_path):
     kevents = [e.payload for e in env["ledger"].events(kind="kill_switch")]
     assert any(k.get("action") == "procedure" for k in kevents)
     killswitch.release(env["dir"], env["ledger"], who="test")
+
+
+def test_automatic_kill_on_realised_drawdown_on_fork(env):
+    """A realised BTC drawdown beyond the frozen limit engages the kill switch with no human action."""
+    import json as _json
+    from btcagent.agent.core import Agent, ROOT
+    from btcagent.risk import killswitch
+    ex = env["ex"]
+    agent = Agent(ROOT / "config" / "agent.yaml", overrides={"mode": "fork", "state_dir": str(env["dir"]), "alerts_dry_run": True,
+                                                             "analyst": {"enabled": False}, "news": {"enabled": False}})
+    agent.executor, agent.ledger = ex, env["ledger"]
+    agent.alerts.ledger = env["ledger"]
+
+    class M:
+        def prices(self):
+            p = env["prices"]
+            p.ts = datetime.now(timezone.utc)
+            return p
+    agent.market = M()
+    assert not killswitch.is_killed(env["dir"])
+    pf = ex.portfolio()
+    assert pf.weights(env["prices"]).get("BTC", 0) >= 0.95            # at rest after the previous kill drill
+    nav = pf.nav_btc(env["prices"])
+    risk = {"day": None, "nav_btc_rest_peak": nav / 0.6, "nav_btc_peak": nav / 0.6, "nav_usd_peak": None}   # as if 40 % BTC lost
+    (env["dir"] / "risk.json").write_text(_json.dumps(risk))
+    out = agent.risk_tick()
+    assert "kill" in out and killswitch.is_killed(env["dir"]), out
+    info = killswitch.kill_info(env["dir"])
+    assert info["auto"] is True and "realised BTC drawdown" in info["reason"]
+    assert "kill_procedure" in out                                     # the procedure ran in the same tick
+    killswitch.release(env["dir"], env["ledger"], who="test")

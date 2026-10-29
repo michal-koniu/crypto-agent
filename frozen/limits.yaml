@@ -23,8 +23,9 @@ position:
 
 loss:
   max_daily_loss_btc_pct: 0.06       # NAV drop in BTC terms since 00:00 UTC -> halt new risk for the day
-  max_drawdown_btc_pct: 0.25         # from the BTC-terms NAV peak -> automatic kill switch
-  max_drawdown_usd_pct: 0.45         # from the USD-terms NAV peak -> automatic kill switch
+  max_drawdown_btc_pct: 0.25         # REALISED: BTC held at rest (>=95 % BTC) vs its highest at-rest value -> kill switch
+  max_drawdown_usd_pct: 0.45         # USD NAV vs its peak -> halt new deviations + alert (not a kill: holding BTC
+                                     # through a bear market is the benchmark; see policy/engine.py risk_state)
   stop_required_for: [ALT, STABLE]   # every non-BTC position needs a stop defined in BTC terms
   max_stop_distance_pct: 0.20        # the stop may not be further than this (BTC terms)
 

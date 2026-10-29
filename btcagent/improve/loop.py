@@ -85,8 +85,9 @@ def postmortem(trip: dict, context: dict, router: Router, ledger: Ledger, playbo
     try:
         r = router.call("triage", prompts.TRIAGE_SYSTEM, user, schemas.Triage, context_id=trip.get("id"))
         t = r.data
+        lesson = t.lesson if t.lesson and t.lesson.strip().lower() not in ("none", "null", "n/a", "-") else None
         rec = {"trip": trip, "failure_class": t.failure_class.value, "confidence": t.confidence, "model": r.model_ref,
-               "served_model": r.served_model, "evidence_refs": t.evidence_refs, "lesson": t.lesson, "lesson_tags": t.lesson_tags}
+               "served_model": r.served_model, "evidence_refs": t.evidence_refs, "lesson": lesson, "lesson_tags": t.lesson_tags}
     except LLMError as e:
         rec = {"trip": trip, "failure_class": "unclassified", "error": str(e)[:300]}
     ev = ledger.append("postmortem", rec)
