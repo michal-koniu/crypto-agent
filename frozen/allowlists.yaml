@@ -1,0 +1,52 @@
+# HUMAN-OWNED allowlists. Anything not listed here cannot be touched by the agent.
+# Adding an entry is a human decision, made after `btcagent risk-check <address>` and reading its report.
+# Addresses are verified on-chain at start-up in fork/live mode (code present, symbol/decimals match).
+
+chains:
+  base:
+    chain_id: 8453
+    native: ETH
+
+venues:
+  okx:   {kind: cex, ccxt_id: myokx}     # OKX Europe (MiCA licence, passported to Poland)
+  kraken: {kind: cex, ccxt_id: kraken}
+  uniswap_v3_base: {kind: dex, chain: base}
+  aave_v3_base: {kind: lending, chain: base}
+  paper: {kind: paper}
+
+assets:
+  BTC:  {class: BTC}
+  USDC: {class: STABLE}
+  USDT: {class: STABLE}
+  ETH:  {class: ALT}
+  SOL:  {class: ALT}
+
+cex_pairs:            # spot pairs the agent may trade on centralised venues
+  okx: [BTC/USDC, ETH/USDC, ETH/BTC, SOL/USDC, SOL/BTC, BTC/USDT, USDT/USDC]
+  kraken: [BTC/USDC, ETH/BTC, SOL/BTC, ETH/USDC]
+
+tokens:               # on-chain tokens per chain (BTC on Base = cbBTC, a custodial wrapper by Coinbase)
+  base:
+    cbBTC: {address: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf", decimals: 8, asset: BTC}
+    USDC:  {address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", decimals: 6, asset: USDC}
+    WETH:  {address: "0x4200000000000000000000000000000000000006", decimals: 18, asset: ETH}
+
+contracts:            # contracts the signer may call, with the only function selectors allowed
+  base:
+    uniswap_v3_swap_router02:
+      address: "0x2626664c2603336E57B271c5C0b26F421741e481"
+      selectors: {exactInputSingle: "0x04e45aaf"}
+    uniswap_v3_quoter_v2:
+      address: "0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a"
+      selectors: {quoteExactInputSingle: "0xc6a5026a"}
+      read_only: true
+    aave_v3_pool:
+      address: "0xA238Dd80C259a72e81d7e4664a9801593F98d1c5"
+      selectors: {supply: "0x617ba037", withdraw: "0x69328dec"}
+    token_approvals:                  # ERC-20 approve(spender, amount) on allowlisted tokens only
+      selectors: {approve: "0x095ea7b3"}
+      spenders: ["0x2626664c2603336E57B271c5C0b26F421741e481", "0xA238Dd80C259a72e81d7e4664a9801593F98d1c5"]
+
+protocols:
+  aave_v3_base: {audits: ["multiple (Aave v3)"], max_weight: 0.60}
+  uniswap_v3_base: {audits: ["multiple (Uniswap v3)"]}

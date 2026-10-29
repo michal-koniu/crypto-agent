@@ -1,0 +1,101 @@
+# Which models power the agent. Change models, providers, fallbacks and budgets here - no code changes.
+#
+# A model reference is "<provider>:<model id>". Providers of kind "openai" speak the OpenAI-compatible
+# chat-completions API (llama-swap / llama.cpp / vLLM / Ollama on the rig, OpenAI, DeepSeek, Qwen DashScope,
+# Moonshot Kimi, Zhipu GLM, OpenRouter). Kind "anthropic" speaks the Anthropic Messages API.
+# API keys are read from the environment variable named in api_key_env; they never live in this file.
+#
+# Default rig layout (llama-swap group "duo", see docs/RIG.md):
+#   GPU 0+1  qwen3.8-flash-next   (radiance)  -> analyst, reflector   (smartest; 200k context)
+#   GPU 2+3  qwen3.6-35b-a3b      (vLLM)      -> critic, reader, triage (fast; a *different* model for critique)
+# Both stay loaded together; anything outside the group makes llama-swap unload them, so every chain falls back
+# to the other duo member first and to gemma-4-26b-a4b (one card, outside the group) only last.
+
+providers:
+  rig:
+    kind: openai
+    base_url: ${BTCAGENT_RIG_URL:-http://localhost:8080/v1}
+    api_key_env: null              # llama-swap accepts any key
+    price_per_mtok: {in: 0.0, out: 0.0}
+  anthropic:
+    kind: anthropic
+    base_url: https://api.anthropic.com
+    api_key_env: ANTHROPIC_API_KEY
+    price_per_mtok: {in: 5.0, out: 25.0}
+  openai:
+    kind: openai
+    base_url: https://api.openai.com/v1
+    api_key_env: OPENAI_API_KEY
+    price_per_mtok: {in: 2.5, out: 10.0}
+  deepseek:
+    kind: openai
+    base_url: https://api.deepseek.com/v1
+    api_key_env: DEEPSEEK_API_KEY
+    price_per_mtok: {in: 0.3, out: 1.2}
+  qwen:
+    kind: openai
+    base_url: https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+    api_key_env: DASHSCOPE_API_KEY
+    price_per_mtok: {in: 0.4, out: 1.2}
+  kimi:
+    kind: openai
+    base_url: https://api.moonshot.ai/v1
+    api_key_env: MOONSHOT_API_KEY
+    price_per_mtok: {in: 0.6, out: 2.5}
+  glm:
+    kind: openai
+    base_url: https://api.z.ai/api/paas/v4
+    api_key_env: ZAI_API_KEY
+    price_per_mtok: {in: 0.6, out: 2.2}
+  openrouter:
+    kind: openai
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    price_per_mtok: {in: 1.0, out: 4.0}
+
+roles:
+  analyst:        # daily decision: reads features, rule states, macro digest, lessons -> risk overlay + forecast
+    model: rig:qwen3.8-flash-next
+    fallbacks: [rig:qwen3.6-35b-a3b, rig:gemma-4-26b-a4b]
+    temperature: 0.6
+    max_tokens: 16000              # thinking model: reasoning + answer
+    timeout_s: 900
+    samples: 3                     # majority vote over independent samples (research C: voting > debate)
+  critic:         # checks the analyst's proposal against the constitution and the evidence; different model
+    model: rig:qwen3.6-35b-a3b
+    fallbacks: [rig:qwen3.8-flash-next, rig:gemma-4-26b-a4b]
+    temperature: 0.3
+    max_tokens: 3000
+    timeout_s: 300
+    extra_body: {chat_template_kwargs: {enable_thinking: false}}
+  reader:         # turns untrusted text (news, token metadata) into typed fields; sees nothing else
+    model: rig:qwen3.6-35b-a3b
+    fallbacks: [rig:qwen3.8-flash-next, rig:gemma-4-26b-a4b]
+    temperature: 0.0
+    max_tokens: 1500
+    timeout_s: 300
+    extra_body: {chat_template_kwargs: {enable_thinking: false}}
+  reflector:      # weekly/monthly review: failure clusters -> at most one typed proposal
+    model: rig:qwen3.8-flash-next
+    fallbacks: [rig:qwen3.6-35b-a3b]
+    temperature: 0.7
+    max_tokens: 20000
+    timeout_s: 1200
+    samples: 3
+  triage:         # classifies a losing trade / failure into a fixed taxonomy (post-mortem step 1)
+    model: rig:qwen3.6-35b-a3b
+    fallbacks: [rig:qwen3.8-flash-next, rig:gemma-4-26b-a4b]
+    temperature: 0.0
+    max_tokens: 1500
+    timeout_s: 300
+    extra_body: {chat_template_kwargs: {enable_thinking: false}}
+
+budgets:
+  per_role_daily_tokens: {analyst: 400000, critic: 150000, reader: 300000, reflector: 300000, triage: 100000}
+  per_provider_daily_usd: {anthropic: 3.0, openai: 3.0, deepseek: 1.0, qwen: 1.0, kimi: 1.0, glm: 1.0, openrouter: 2.0}
+  on_budget_exhausted: fallback      # fallback (next model in the chain) | skip (no LLM; rules only)
+
+# Examples - switch the analyst to a cloud model, config only:
+#   analyst: {model: anthropic:claude-opus-5-5, fallbacks: [rig:qwen3.8-flash-next], ...}
+#   analyst: {model: deepseek:deepseek-chat, fallbacks: [rig:qwen3.8-flash-next], ...}
+#   analyst: {model: kimi:kimi-k2-0905-preview, ...}    analyst: {model: glm:glm-4.6, ...}

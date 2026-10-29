@@ -1,0 +1,42 @@
+# HUMAN-OWNED gate rules for the self-improvement loop (course 03 §6 gate cascade, adapted to trading;
+# deviations documented in docs/SELF_IMPROVEMENT.md). The gatekeeper is code; these are its thresholds.
+
+static:
+  max_params_changed: 2
+  require: [hypothesis, evidence, predicted_effect]
+  allowed_ops: [PARAM_CHANGE, PLAYBOOK_ADD, PLAYBOOK_MODIFY, PLAYBOOK_RETIRE, DISABLE_ALT_GATE, ENABLE_ALT_GATE]
+  human_only_ops: [FROZEN_CHANGE_REQUEST]
+  rejected_idea_cooldown_days: 30
+
+must_pass:          # stress windows: the challenger may not lose more than `max_rel_loss` BTC vs the champion in any
+  max_rel_loss: 0.10
+  windows:
+    - {name: "2014-15 bear", start: "2014-01-01", end: "2015-12-31"}
+    - {name: "2017-18 top and bear", start: "2017-10-01", end: "2019-01-31"}
+    - {name: "2020 covid crash", start: "2020-01-01", end: "2020-06-30"}
+    - {name: "2021-22 top and bear", start: "2021-10-01", end: "2023-01-31"}
+    - {name: "2025-26 top and bear", start: "2025-09-01", end: "2099-01-01"}
+
+backtest:           # full history, paired with the champion, per halving cycle and per year
+  min_full_multiple_gain: 0.02        # challenger / champion BTC multiple - 1 must be at least this
+  max_cycles_worse: 1                 # cycles where the challenger is >2 % worse than the champion
+  cycle_worse_tolerance: 0.02
+  max_bootstrap_p: 0.20               # P(mean weekly log difference <= 0), moving-block bootstrap
+  report_deflated_sharpe: true        # n_trials = every proposal ever backtested (ledger)
+
+shadow:             # challenger and champion run side by side on live data; only the champion acts
+  min_weeks: 4
+  max_weeks: 12                       # no decision by then -> keep the champion (status-quo bias)
+  non_inferiority: 0.01               # challenger virtual NAV >= champion virtual NAV * (1 - this)
+  judgment_min_scored_forecasts: 10   # playbook judgment changes: Brier score, paired, on >= this many forecasts
+
+probation:
+  weeks: 12
+  page_hinkley: {delta: 0.002, lambda: 0.03}   # on weekly log(new / old-champion-shadow)
+  max_underperformance: 0.03          # cumulative; beyond -> automatic rollback
+
+controller:
+  base_reflection_interval_days: 7
+  backoff_cap_days: 28
+  maintenance_after_rejections: 3
+  min_trigger_cluster: 3              # >= 3 same-class post-mortems open a reflection

@@ -1,0 +1,482 @@
+{
+ "V1_50w_exit_reclaim_only": {
+  "summary": {
+   "start": "2011-06-26",
+   "end": "2026-10-28",
+   "years": 15.34,
+   "btc_multiple": 1.1905,
+   "btc_cagr": 0.0114,
+   "max_dd_btc": -0.7983,
+   "max_dd_usd": -0.8759,
+   "hodl_max_dd_usd": -0.8759,
+   "usd_multiple": 5910.839,
+   "hodl_usd_multiple": 4965.206,
+   "ann_vol_excess": 0.3339,
+   "sharpe_excess": 0.034,
+   "n_trades": 14,
+   "fees_btc": 0.034401,
+   "time_in_btc": 0.715,
+   "round_trips": 7,
+   "win_rate": 0.571,
+   "avg_round_trip_gain_btc": 0.0645
+  },
+  "per_cycle": {
+   "pre-2012": 1.0,
+   "2012-2016": 1.5352,
+   "2016-2020": 0.578,
+   "2020-2024": 1.26,
+   "2024-now": 1.0496
+  },
+  "cycles_won_vs_hodl": 3,
+  "cycles": 5,
+  "sign_test_cycles": {
+   "n": 4,
+   "wins": 3,
+   "p_one_sided": 0.3125
+  },
+  "sign_test_years": {
+   "n": 9,
+   "wins": 4,
+   "p_one_sided": 0.74609375
+  },
+  "bootstrap_p_mean_le_0": 0.4395,
+  "deflated_sharpe": {
+   "sr": 0.0048,
+   "sr0": 0.0249,
+   "dsr": 0.2844,
+   "t": 801
+  }
+ },
+ "V2_V1_plus_ladder": {
+  "summary": {
+   "start": "2011-06-26",
+   "end": "2026-10-28",
+   "years": 15.34,
+   "btc_multiple": 1.1905,
+   "btc_cagr": 0.0114,
+   "max_dd_btc": -0.7983,
+   "max_dd_usd": -0.8759,
+   "hodl_max_dd_usd": -0.8759,
+   "usd_multiple": 5910.839,
+   "hodl_usd_multiple": 4965.206,
+   "ann_vol_excess": 0.3339,
+   "sharpe_excess": 0.034,
+   "n_trades": 14,
+   "fees_btc": 0.034401,
+   "time_in_btc": 0.715,
+   "round_trips": 7,
+   "win_rate": 0.571,
+   "avg_round_trip_gain_btc": 0.0645
+  },
+  "per_cycle": {
+   "pre-2012": 1.0,
+   "2012-2016": 1.5352,
+   "2016-2020": 0.578,
+   "2020-2024": 1.26,
+   "2024-now": 1.0496
+  },
+  "cycles_won_vs_hodl": 3,
+  "cycles": 5,
+  "sign_test_cycles": {
+   "n": 4,
+   "wins": 3,
+   "p_one_sided": 0.3125
+  },
+  "sign_test_years": {
+   "n": 9,
+   "wins": 4,
+   "p_one_sided": 0.74609375
+  },
+  "bootstrap_p_mean_le_0": 0.4395,
+  "deflated_sharpe": {
+   "sr": 0.0048,
+   "sr0": 0.0249,
+   "dsr": 0.2844,
+   "t": 801
+  }
+ },
+ "V3_V1_plus_stop20": {
+  "summary": {
+   "start": "2011-06-26",
+   "end": "2026-10-28",
+   "years": 15.34,
+   "btc_multiple": 1.5474,
+   "btc_cagr": 0.0289,
+   "max_dd_btc": -0.7378,
+   "max_dd_usd": -0.8759,
+   "hodl_max_dd_usd": -0.8759,
+   "usd_multiple": 7682.918,
+   "hodl_usd_multiple": 4965.206,
+   "ann_vol_excess": 0.3254,
+   "sharpe_excess": 0.087,
+   "n_trades": 14,
+   "fees_btc": 0.038475,
+   "time_in_btc": 0.726,
+   "round_trips": 7,
+   "win_rate": 0.571,
+   "avg_round_trip_gain_btc": 0.0906
+  },
+  "per_cycle": {
+   "pre-2012": 1.0,
+   "2012-2016": 1.5352,
+   "2016-2020": 0.7421,
+   "2020-2024": 1.2941,
+   "2024-now": 1.0496
+  },
+  "cycles_won_vs_hodl": 3,
+  "cycles": 5,
+  "sign_test_cycles": {
+   "n": 4,
+   "wins": 3,
+   "p_one_sided": 0.3125
+  },
+  "sign_test_years": {
+   "n": 9,
+   "wins": 4,
+   "p_one_sided": 0.74609375
+  },
+  "bootstrap_p_mean_le_0": 0.361,
+  "deflated_sharpe": {
+   "sr": 0.0122,
+   "sr0": 0.0249,
+   "dsr": 0.359,
+   "t": 801
+  }
+ },
+ "V4_V2_plus_stop20": {
+  "summary": {
+   "start": "2011-06-26",
+   "end": "2026-10-28",
+   "years": 15.34,
+   "btc_multiple": 1.5474,
+   "btc_cagr": 0.0289,
+   "max_dd_btc": -0.7378,
+   "max_dd_usd": -0.8759,
+   "hodl_max_dd_usd": -0.8759,
+   "usd_multiple": 7682.918,
+   "hodl_usd_multiple": 4965.206,
+   "ann_vol_excess": 0.3254,
+   "sharpe_excess": 0.087,
+   "n_trades": 14,
+   "fees_btc": 0.038475,
+   "time_in_btc": 0.726,
+   "round_trips": 7,
+   "win_rate": 0.571,
+   "avg_round_trip_gain_btc": 0.0906
+  },
+  "per_cycle": {
+   "pre-2012": 1.0,
+   "2012-2016": 1.5352,
+   "2016-2020": 0.7421,
+   "2020-2024": 1.2941,
+   "2024-now": 1.0496
+  },
+  "cycles_won_vs_hodl": 3,
+  "cycles": 5,
+  "sign_test_cycles": {
+   "n": 4,
+   "wins": 3,
+   "p_one_sided": 0.3125
+  },
+  "sign_test_years": {
+   "n": 9,
+   "wins": 4,
+   "p_one_sided": 0.74609375
+  },
+  "bootstrap_p_mean_le_0": 0.361,
+  "deflated_sharpe": {
+   "sr": 0.0122,
+   "sr0": 0.0249,
+   "dsr": 0.359,
+   "t": 801
+  }
+ },
+ "V5_V4_plus_trim": {
+  "summary": {
+   "start": "2011-06-26",
+   "end": "2026-10-28",
+   "years": 15.34,
+   "btc_multiple": 1.0055,
+   "btc_cagr": 0.0004,
+   "max_dd_btc": -0.7378,
+   "max_dd_usd": -0.8759,
+   "hodl_max_dd_usd": -0.8759,
+   "usd_multiple": 4992.293,
+   "hodl_usd_multiple": 4965.206,
+   "ann_vol_excess": 0.3332,
+   "sharpe_excess": 0.001,
+   "n_trades": 50,
+   "fees_btc": 0.038361,
+   "time_in_btc": 0.72,
+   "round_trips": 25,
+   "win_rate": 0.36,
+   "avg_round_trip_gain_btc": -0.0338
+  },
+  "per_cycle": {
+   "pre-2012": 0.9739,
+   "2012-2016": 0.9484,
+   "2016-2020": 0.8014,
+   "2020-2024": 1.2941,
+   "2024-now": 1.0496
+  },
+  "cycles_won_vs_hodl": 2,
+  "cycles": 5,
+  "sign_test_cycles": {
+   "n": 5,
+   "wins": 2,
+   "p_one_sided": 0.8125
+  },
+  "sign_test_years": {
+   "n": 12,
+   "wins": 5,
+   "p_one_sided": 0.80615234375
+  },
+  "bootstrap_p_mean_le_0": 0.4865,
+  "deflated_sharpe": {
+   "sr": 0.0001,
+   "sr0": 0.0249,
+   "dsr": 0.2418,
+   "t": 801
+  }
+ },
+ "V6_V1_no_maturity_filter": {
+  "summary": {
+   "start": "2011-06-26",
+   "end": "2026-10-28",
+   "years": 15.34,
+   "btc_multiple": 1.1905,
+   "btc_cagr": 0.0114,
+   "max_dd_btc": -0.7983,
+   "max_dd_usd": -0.8759,
+   "hodl_max_dd_usd": -0.8759,
+   "usd_multiple": 5910.839,
+   "hodl_usd_multiple": 4965.206,
+   "ann_vol_excess": 0.3339,
+   "sharpe_excess": 0.034,
+   "n_trades": 14,
+   "fees_btc": 0.034401,
+   "time_in_btc": 0.715,
+   "round_trips": 7,
+   "win_rate": 0.571,
+   "avg_round_trip_gain_btc": 0.0645
+  },
+  "per_cycle": {
+   "pre-2012": 1.0,
+   "2012-2016": 1.5352,
+   "2016-2020": 0.578,
+   "2020-2024": 1.26,
+   "2024-now": 1.0496
+  },
+  "cycles_won_vs_hodl": 3,
+  "cycles": 5,
+  "sign_test_cycles": {
+   "n": 4,
+   "wins": 3,
+   "p_one_sided": 0.3125
+  },
+  "sign_test_years": {
+   "n": 9,
+   "wins": 4,
+   "p_one_sided": 0.74609375
+  },
+  "bootstrap_p_mean_le_0": 0.4395,
+  "deflated_sharpe": {
+   "sr": 0.0048,
+   "sr0": 0.0249,
+   "dsr": 0.2844,
+   "t": 801
+  }
+ },
+ "V7_V1_exit_3w": {
+  "summary": {
+   "start": "2011-06-26",
+   "end": "2026-10-28",
+   "years": 15.34,
+   "btc_multiple": 1.3547,
+   "btc_cagr": 0.02,
+   "max_dd_btc": -0.7319,
+   "max_dd_usd": -0.8759,
+   "hodl_max_dd_usd": -0.8759,
+   "usd_multiple": 6726.264,
+   "hodl_usd_multiple": 4965.206,
+   "ann_vol_excess": 0.3267,
+   "sharpe_excess": 0.061,
+   "n_trades": 12,
+   "fees_btc": 0.028316,
+   "time_in_btc": 0.725,
+   "round_trips": 6,
+   "win_rate": 0.5,
+   "avg_round_trip_gain_btc": 0.0827
+  },
+  "per_cycle": {
+   "pre-2012": 1.0,
+   "2012-2016": 1.4449,
+   "2016-2020": 0.6537,
+   "2020-2024": 1.2923,
+   "2024-now": 1.0941
+  },
+  "cycles_won_vs_hodl": 3,
+  "cycles": 5,
+  "sign_test_cycles": {
+   "n": 4,
+   "wins": 3,
+   "p_one_sided": 0.3125
+  },
+  "sign_test_years": {
+   "n": 9,
+   "wins": 5,
+   "p_one_sided": 0.5
+  },
+  "bootstrap_p_mean_le_0": 0.4,
+  "deflated_sharpe": {
+   "sr": 0.0085,
+   "sr0": 0.0249,
+   "dsr": 0.3206,
+   "t": 801
+  }
+ },
+ "V8_V1_half_exit": {
+  "summary": {
+   "start": "2011-06-26",
+   "end": "2026-10-28",
+   "years": 15.34,
+   "btc_multiple": 1.1788,
+   "btc_cagr": 0.0108,
+   "max_dd_btc": -0.5759,
+   "max_dd_usd": -0.8759,
+   "hodl_max_dd_usd": -0.8759,
+   "usd_multiple": 5853.086,
+   "hodl_usd_multiple": 4965.206,
+   "ann_vol_excess": 0.2021,
+   "sharpe_excess": 0.053,
+   "n_trades": 14,
+   "fees_btc": 0.01624,
+   "time_in_btc": 0.831,
+   "round_trips": 7,
+   "win_rate": 0.571,
+   "avg_round_trip_gain_btc": 0.0645
+  },
+  "per_cycle": {
+   "pre-2012": 1.0,
+   "2012-2016": 1.2676,
+   "2016-2020": 0.7872,
+   "2020-2024": 1.1465,
+   "2024-now": 1.0248
+  },
+  "cycles_won_vs_hodl": 3,
+  "cycles": 5,
+  "sign_test_cycles": {
+   "n": 4,
+   "wins": 3,
+   "p_one_sided": 0.3125
+  },
+  "sign_test_years": {
+   "n": 9,
+   "wins": 4,
+   "p_one_sided": 0.74609375
+  },
+  "bootstrap_p_mean_le_0": 0.408,
+  "deflated_sharpe": {
+   "sr": 0.0075,
+   "sr0": 0.0249,
+   "dsr": 0.3107,
+   "t": 801
+  }
+ },
+ "V9_V4_plus_alt_gate": {
+  "summary": {
+   "start": "2011-06-26",
+   "end": "2026-10-28",
+   "years": 15.34,
+   "btc_multiple": 1.4686,
+   "btc_cagr": 0.0254,
+   "max_dd_btc": -0.7512,
+   "max_dd_usd": -0.8759,
+   "hodl_max_dd_usd": -0.8759,
+   "usd_multiple": 7291.706,
+   "hodl_usd_multiple": 4965.206,
+   "ann_vol_excess": 0.3255,
+   "sharpe_excess": 0.077,
+   "n_trades": 22,
+   "fees_btc": 0.040246,
+   "time_in_btc": 0.725,
+   "round_trips": 11,
+   "win_rate": 0.364,
+   "avg_round_trip_gain_btc": 0.0275
+  },
+  "per_cycle": {
+   "pre-2012": 1.0,
+   "2012-2016": 1.5352,
+   "2016-2020": 0.7421,
+   "2020-2024": 1.2282,
+   "2024-now": 1.0496
+  },
+  "cycles_won_vs_hodl": 3,
+  "cycles": 5,
+  "sign_test_cycles": {
+   "n": 4,
+   "wins": 3,
+   "p_one_sided": 0.3125
+  },
+  "sign_test_years": {
+   "n": 10,
+   "wins": 4,
+   "p_one_sided": 0.828125
+  },
+  "bootstrap_p_mean_le_0": 0.38,
+  "deflated_sharpe": {
+   "sr": 0.0107,
+   "sr0": 0.0249,
+   "dsr": 0.3436,
+   "t": 801
+  }
+ },
+ "V10_alt_gate_only": {
+  "summary": {
+   "start": "2011-06-26",
+   "end": "2026-10-28",
+   "years": 15.34,
+   "btc_multiple": 0.9491,
+   "btc_cagr": -0.0034,
+   "max_dd_btc": -0.0587,
+   "max_dd_usd": -0.8759,
+   "hodl_max_dd_usd": -0.8759,
+   "usd_multiple": 4712.38,
+   "hodl_usd_multiple": 4965.206,
+   "ann_vol_excess": 0.0097,
+   "sharpe_excess": -0.35,
+   "n_trades": 8,
+   "fees_btc": 0.002242,
+   "time_in_btc": 0.999,
+   "round_trips": 4,
+   "win_rate": 0.0,
+   "avg_round_trip_gain_btc": -0.0828
+  },
+  "per_cycle": {
+   "pre-2012": 1.0,
+   "2012-2016": 1.0,
+   "2016-2020": 1.0,
+   "2020-2024": 0.9491,
+   "2024-now": 1.0
+  },
+  "cycles_won_vs_hodl": 0,
+  "cycles": 5,
+  "sign_test_cycles": {
+   "n": 1,
+   "wins": 0,
+   "p_one_sided": 1.0
+  },
+  "sign_test_years": {
+   "n": 1,
+   "wins": 0,
+   "p_one_sided": 1.0
+  },
+  "bootstrap_p_mean_le_0": 0.9885,
+  "deflated_sharpe": {
+   "sr": -0.044,
+   "sr0": 0.0249,
+   "dsr": 0.0139,
+   "t": 801
+  }
+ }
+}

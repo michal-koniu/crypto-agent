@@ -1,0 +1,42 @@
+version: 1
+sections:
+  judgment:
+  - id: J-001
+    text: The rules' exit and re-entry states come from a backtest over every BTC cycle since 2011. Lower conviction only
+      for a concrete, verifiable reason in today's data, never because a narrative or an analyst's price target disagrees.
+    tags: [rules, evidence]
+    added_in: 1
+    provenance: [reports/variants_v1.json]
+    helpful: 0
+    harmful: 0
+    last_used: null
+  - id: J-002
+    text: Rate cuts are not automatically bullish and hikes are not immediately bearish (Cowen's own Sept-2026 miss);
+      weigh the policy direction together with liquidity, the dollar and equity risk, not a single print.
+    tags: [macro, rates]
+    added_in: 1
+    provenance: [research/E-cowen-framework.md#2.8]
+    helpful: 0
+    harmful: 0
+    last_used: null
+  - id: J-003
+    text: Altcoins have lost to BTC in every cycle of the variant study; the alt gate is disabled. Do not argue for
+      altcoin exposure.
+    tags: [alts]
+    added_in: 1
+    provenance: [reports/variants_v1.json]
+    helpful: 0
+    harmful: 0
+    last_used: null
+  lessons: []
+  procedure:
+  - id: P-001
+    text: When the news digest is empty or failed, decide from the rule states and features alone; missing news is not
+      evidence of anything.
+    tags: [data]
+    added_in: 1
+    provenance: []
+    helpful: 0
+    harmful: 0
+    last_used: null
+archive: []

@@ -1,0 +1,56 @@
+# Operational configuration (human-owned, not frozen: changing it changes operations, not safety).
+# Safety limits live in frozen/limits.yaml; models in config/models.yaml.
+
+mode: paper                     # paper | fork | live (live also needs frozen stage=live and BTCAGENT_LIVE=...)
+executor: paper                 # paper (live prices, simulated fills) | evm (Base; fork or live) | cex (via signer)
+state_dir: ~/.local/state/btcagent
+data_dir: ~/.local/share/btcagent/data
+models: config/models.yaml
+strategies: evolvable/strategies.yaml
+playbook: evolvable/playbook.yaml
+
+paper:
+  initial_deposit: {USDC: 100}  # the 100 USDT, as USDC (USDT is not tradable on MiCA venues; research A)
+  lend_apy: {aave_v3_base: 0.05}
+
+evm:
+  chain: base
+  rpc_url: http://127.0.0.1:8545   # Anvil fork in fork mode
+  signer_port: 8790
+
+schedule:
+  risk_tick_seconds: 60          # stops, drawdown, halts, kill switch - deterministic, no LLM
+  decision_utc: "00:30"          # daily decision cycle (weekly rule step happens on the first cycle after Sunday's close)
+  data_refresh_hours: 20
+  review: weekly                 # daily | weekly | monthly - how often a scheduled review may open a reflection
+  review_weekday: 6              # 0 = Monday ... 6 = Sunday
+  monthly_report_day: 1
+  heartbeat_minutes: 60
+
+trading:
+  min_trade_nav_fraction: 0.05   # ignore weight changes smaller than this (anti-churn)
+  stable: USDC
+  venue_pairs_note: "paper mirrors OKX Europe: BTC/USDC"
+
+yield:
+  enabled: true
+  protocol: aave_v3_base
+  keep_liquid_fraction: 0.0      # share of stables kept liquid (Aave withdrawals are instant unless utilisation is 100%)
+  min_usd: 20                    # do not bother lending dust (gas/fees would exceed interest)
+  expected_apy: 0.05
+  lockup_hours: 0
+
+analyst:
+  enabled: true                  # false = rules only (the validated strategy without any LLM overlay)
+  samples: 3
+  critic: true
+
+news:
+  enabled: true
+  since_hours: 30
+
+alerts:
+  email_to: offlinelocalagents@gmail.com   # via the rig's msmtp (already configured for Netdata alerts)
+  email_enabled: true
+  telegram_enabled: false        # needs BTCAGENT_TELEGRAM_TOKEN and BTCAGENT_TELEGRAM_CHAT in the environment
+  min_interval_minutes: 30       # rate limit for repeated alerts of the same kind

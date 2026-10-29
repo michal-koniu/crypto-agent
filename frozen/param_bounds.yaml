@@ -1,0 +1,30 @@
+# HUMAN-OWNED bounds for every evolvable strategy parameter. A proposal outside these bounds is rejected by the
+# static gate before any test runs. Bounds are deliberately coarse: there are only 3-4 BTC cycles of history, so
+# fine-grained tuning is overfitting (research E, overfitting checklist).
+cycle_guard:
+  exit_weeks_below_50w: [1, 4]
+  exit_min_days_since_halving: [0, 600]
+  exit_fraction: [0.25, 1.0]
+  trim_risk: [0.75, 1.0]
+  trim_resid_pct: [0.85, 1.0]
+  trim_fraction: [0.0, 0.5]
+  reentry_min_days_since_ath: [150, 500]
+  reentry_sma200w_mult: [0.8, 1.3]
+  reentry_max_price_to_realized: [0.7, 1.5]
+  reentry_max_mvrv: [0.7, 1.5]
+  reentry_max_risk: [0.05, 0.4]
+  reentry_k: [1, 4]
+  reentry_tranche: [0.1, 1.0]
+  reclaim_weeks: [1, 6]
+  max_days_in_stable: [180, 730]
+  stable_stop_btc_pct: [0.05, 0.20]      # never looser than frozen limits.loss.max_stop_distance_pct
+alt_gate:
+  enabled: [false, true]
+  eth_weight: [0.0, 0.15]                 # never above frozen limits.position.max_asset_weight.ALT
+  eth_stop_btc_pct: [0.05, 0.20]
+  exit_weeks_below_sma20w: [1, 4]
+yield:
+  stable_apy_haircut: [0.0, 0.03]
+  btc_apy: [0.0, 0.0]
+expected_edge_bps: [100, 2000]
+max_params_changed_per_proposal: 2

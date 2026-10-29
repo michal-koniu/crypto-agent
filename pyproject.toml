@@ -1,0 +1,39 @@
+[project]
+name = "btcagent"
+version = "0.1.0"
+description = "Autonomous agent that grows a crypto portfolio measured in BTC. The LLM proposes; a deterministic policy engine disposes."
+requires-python = ">=3.11"
+license = { text = "Proprietary - private repository" }
+dependencies = [
+  "pydantic>=2.7",
+  "pyyaml>=6.0",
+  "httpx>=0.27",
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "ccxt>=4.4",
+  "eth-account>=0.13",
+  "web3>=7.0",
+  "feedparser>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-timeout>=2.3"]
+
+[project.scripts]
+btcagent = "btcagent.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["btcagent*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "live_llm: needs the rig's local models (llama-swap on :8080)",
+  "fork: needs an Anvil fork of Base (docker)",
+  "network: needs internet access to public data APIs",
+]
+timeout = 900

@@ -1,0 +1,54 @@
+# HUMAN-OWNED. The agent can read this file but can never change it.
+# The core refuses to start if this file's hash differs from frozen/frozen.lock
+# (re-lock after an edit with:  btcagent frozen lock).
+#
+# All percentages are fractions of NAV (net asset value) unless stated.
+# NAV is measured in BTC; USD values are used only for absolute caps.
+
+stage: paper            # backtest | paper | fork | live   (live also needs BTCAGENT_LIVE=I_ACCEPT_REAL_LOSSES)
+capital_cap_usd: 100    # live stage: the agent manages at most this much; anything above stays untouched
+
+position:
+  max_asset_weight:            # post-trade weight per asset class
+    BTC: 1.00                  # BTC is the numeraire and the resting state
+    STABLE: 1.00               # stablecoins (risk-off leg; a bet against BTC)
+    ALT: 0.15                  # any single altcoin
+  max_alts_total_weight: 0.25
+  max_protocol_weight: 0.60    # e.g. a lending market
+  max_chain_weight: 1.00
+  max_venue_weight: 1.00
+  max_order_nav_fraction: 0.60 # one order may move at most this share of NAV
+  max_order_usd: 3500
+
+loss:
+  max_daily_loss_btc_pct: 0.06       # NAV drop in BTC terms since 00:00 UTC -> halt new risk for the day
+  max_drawdown_btc_pct: 0.25         # from the BTC-terms NAV peak -> automatic kill switch
+  max_drawdown_usd_pct: 0.45         # from the USD-terms NAV peak -> automatic kill switch
+  stop_required_for: [ALT, STABLE]   # every non-BTC position needs a stop defined in BTC terms
+  max_stop_distance_pct: 0.20        # the stop may not be further than this (BTC terms)
+
+costs:
+  max_slippage_bps: 60          # quoted price impact vs reference price
+  max_total_cost_bps: 120       # fees + spread + slippage + gas, as a share of the order
+  min_edge_to_cost_ratio: 2.0   # expected edge must be at least this multiple of the known cost
+  max_gas_usd_per_tx: 1.50
+  require_cost_estimate: true   # no cost estimate -> no trade
+
+rate:
+  max_orders_per_hour: 3
+  max_orders_per_day: 6
+  max_orders_per_week: 12
+  min_hours_between_trades_same_asset: 24   # anti-churn; stop-loss exits are exempt
+
+approvals:
+  allow_unlimited: false
+  max_approval_multiple: 1.01   # approve at most 1.01x the amount being spent
+  revoke_after_use: true
+
+kill_switch:
+  default_mode: to_btc          # halt_only | to_btc | to_stable | to_safe_address
+  safe_address: null            # set by the human before live; kill mode to_safe_address needs it
+
+data:
+  max_price_age_seconds: 180    # stale prices -> no new orders
+  max_source_divergence_pct: 1.5  # two independent BTC prices disagree more -> no new orders, alert

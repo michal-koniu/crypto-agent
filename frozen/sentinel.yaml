@@ -1,0 +1,25 @@
+# HUMAN-OWNED sentinel (course 03 §8): a pinned copy of the strategy that NEVER changes. It runs in shadow forever
+# so that "the world changed" can be told apart from "my change broke it" (difference-in-differences).
+# Pinned 2026-10-29 = cycle_guard_v2.
+name: sentinel_cycle_guard_v2
+params:
+  expected_edge_bps: 900
+  cycle_guard:
+    exit_weeks_below_50w: 2
+    exit_min_days_since_halving: 365
+    exit_fraction: 1.0
+    trim_risk: 1.0
+    trim_resid_pct: 1.0
+    trim_fraction: 0.0
+    reentry_min_days_since_ath: 300
+    reentry_sma200w_mult: 1.0
+    reentry_max_price_to_realized: 1.0
+    reentry_max_mvrv: 1.0
+    reentry_max_risk: 0.20
+    reentry_k: 2
+    reentry_tranche: 0.25
+    reclaim_weeks: 2
+    max_days_in_stable: 450
+    stable_stop_btc_pct: 0.20
+  alt_gate: {enabled: false, eth_weight: 0.15, eth_stop_btc_pct: 0.12, exit_weeks_below_sma20w: 2}
+  yield: {stable_apy_haircut: 0.01, btc_apy: 0.0}

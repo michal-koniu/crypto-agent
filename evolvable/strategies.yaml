@@ -1,0 +1,42 @@
+# EVOLVABLE: the self-improvement loop may change this file, but only through the gatekeeper
+# (typed proposal -> gates -> shadow -> promotion -> probation), one parameter group at a time,
+# within frozen/param_bounds.yaml. Every promoted version is a git commit; the previous one is kept for rollback.
+#
+# Champion selection (2026-10-29, reports/variants_v1.json, docs/STRATEGY.md): variant V4 of the pre-registered
+# study = Cowen's 50W-SMA exit with re-entry on reclaim, the re-entry ladder and a 20 % BTC-terms stop on the
+# stablecoin leg; valuation trim OFF (hurt: 1.01x) and alt gate OFF (lost in every cycle: 0.95x).
+# Result 2011-2026: 1.55x BTC vs 1.00x for holding BTC, 3 of 4 trading cycles won, 7 round trips, 57 % won,
+# average round trip +9.1 % BTC. Deflated Sharpe 0.36 over 10 trials: NOT statistically significant.
+version: 2
+champion: cycle_guard_v2
+expected_edge_bps: 900          # average BTC gain per round trip in the backtest, before costs
+strategies:
+  cycle_guard_v2:
+    description: "BTC by default; exit to stables after 2 weekly closes below the 50W SMA in a mature cycle; staged re-entry; forced re-entry on 50W reclaim, a 20% BTC-terms stop, or 450 days out."
+    cycle_guard:
+      exit_weeks_below_50w: 2
+      exit_min_days_since_halving: 365
+      exit_fraction: 1.0
+      trim_risk: 1.0
+      trim_resid_pct: 1.0
+      trim_fraction: 0.0
+      reentry_min_days_since_ath: 300
+      reentry_sma200w_mult: 1.0
+      reentry_max_price_to_realized: 1.0
+      reentry_max_mvrv: 1.0
+      reentry_max_risk: 0.20
+      reentry_k: 2
+      reentry_tranche: 0.25
+      reclaim_weeks: 2
+      max_days_in_stable: 450
+      stable_stop_btc_pct: 0.20
+    alt_gate:
+      enabled: false
+      eth_weight: 0.15
+      eth_stop_btc_pct: 0.12
+      exit_weeks_below_sma20w: 2
+    yield:
+      stable_apy_haircut: 0.01
+      btc_apy: 0.0
+archive:
+  cycle_guard_v1: {replaced: 2026-10-29, reason: "valuation trim and alt gate lost to HODL in the variant study (0.95x overall)"}
