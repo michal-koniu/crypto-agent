@@ -64,8 +64,9 @@ roles:
   critic:         # checks the analyst's proposal against the constitution and the evidence; different model
     model: rig:qwen3.6-35b-a3b
     fallbacks: [rig:qwen3.8-flash-next, rig:gemma-4-26b-a4b]
-    temperature: 0.3
-    max_tokens: 3000
+    temperature: 0.0               # at 0.3 qwen3.6 produced malformed JSON 3/3 times on long issue lists (e2e test);
+    json_strict: true              # at 0.0 with a strict schema: 5/5 valid
+    max_tokens: 6000
     timeout_s: 300
     extra_body: {chat_template_kwargs: {enable_thinking: false}}
   reader:         # turns untrusted text (news, token metadata) into typed fields; sees nothing else

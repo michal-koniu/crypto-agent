@@ -15,6 +15,7 @@ Everything lands as CSV in the data directory; `panel()` joins it into one daily
 from __future__ import annotations
 
 import io
+import os
 import time
 import zipfile
 from datetime import date, datetime, timezone
@@ -150,7 +151,9 @@ def download_all(data_dir: str | Path, log=print, include_yahoo: bool = True) ->
         for name, fn in jobs:
             try:
                 df = fn()
-                df.to_csv(d / f"{name}.csv", index=False)
+                tmp = d / f".{name}.csv.tmp"
+                df.to_csv(tmp, index=False)
+                os.replace(tmp, d / f"{name}.csv")       # atomic: readers never see a half-written file
                 counts[name] = len(df)
                 log(f"data: {name} {len(df)} rows")
             except Exception as e:  # keep going: one dead source must not stop the others

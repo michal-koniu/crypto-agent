@@ -3,7 +3,7 @@ enums leaves little room for an injected instruction to do harm (it can at worst
 from __future__ import annotations
 
 from enum import Enum
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
@@ -91,7 +91,7 @@ class CriticVerdict(BaseModel):
     verdict: Literal["approve", "reduce", "reject"]
     max_conviction_stable: float = Field(ge=0, le=1)
     max_conviction_alt: float = Field(ge=0, le=1)
-    issues: list[str] = Field(default_factory=list, max_length=8)
+    issues: list[Annotated[str, Field(max_length=400)]] = Field(default_factory=list, max_length=6)
 
 
 class FailureClass(str, Enum):

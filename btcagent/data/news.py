@@ -30,6 +30,13 @@ FEEDS = {   # tier: 1 = primary source (central bank, regulator), 2 = establishe
 }
 MAX_ITEMS = 25
 TAG_RE = re.compile(r"<[^>]+>")
+# Deterministic second layer (the model is the first): instruction-like phrasing aimed at an AI/agent/system.
+INJECTION_RE = re.compile(
+    r"(ignore (all |any )?(previous|prior|above) instructions|\bsystem\s*(:|override|prompt)|you are now|"
+    r"approve unlimited|unlimited (spending|approval)|disable (the )?(limits?|risk|signer|checks?)|"
+    r"(raise|increase|lift) (the )?(drawdown|limit|max_)|max_order|allowlist|transfer (all )?funds|"
+    r"as (the|an) administrator|by order of|automated (trading )?(systems|agents?)|ai agents?:|tell the (portfolio )?agent)",
+    re.I)
 
 
 def _clean(s: str, n: int) -> str:
@@ -73,6 +80,10 @@ def read_items(items: list[dict], router: Router, ledger: Ledger, decision_id: s
             # source tier caps severity: an aggregator cannot produce a severity-3 event
             if it["tier"] >= 3:
                 d["severity"] = min(d["severity"], 1)
+            code_flag = bool(INJECTION_RE.search(it["title"] + " " + it["summary"]))
+            d["flagged_by"] = ("model+code" if d["contains_instructions"] and code_flag else
+                               "model" if d["contains_instructions"] else "code" if code_flag else None)
+            d["contains_instructions"] = d["contains_instructions"] or code_flag
             rec = {"item_id": it["id"], "source": it["source"], "tier": it["tier"], "model": r.model_ref, **d}
         except LLMError as e:
             rec = {"item_id": it["id"], "source": it["source"], "error": str(e)[:200]}

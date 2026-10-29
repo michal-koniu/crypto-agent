@@ -112,7 +112,8 @@ class Router:
             raise LLMError(f"missing API key env {prov['api_key_env']}")
         body = {"model": model, "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
                 "temperature": rc.get("temperature", 0.2), "max_tokens": rc.get("max_tokens", 2000),
-                "response_format": {"type": "json_schema", "json_schema": {"name": "answer", "schema": schema, "strict": False}}}
+                "response_format": {"type": "json_schema", "json_schema": {"name": "answer", "schema": schema,
+                                                                          "strict": bool(rc.get("json_strict", False))}}}
         body.update(rc.get("extra_body") or {})          # e.g. chat_template_kwargs: {enable_thinking: false}
         url = prov["base_url"].rstrip("/") + "/chat/completions"
         h = {"Authorization": f"Bearer {key}"}

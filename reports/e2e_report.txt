@@ -1,0 +1,118 @@
+
+=== 2026-10-29T19:11:03Z 1. clone
+b5851a2 Realised-drawdown kill, signer kill-mode approvals, post-mortem facts, triage model, propose CLI, fork kill tests, docs
+
+=== 2026-10-29T19:11:05Z 2. install (SETUP.md §1)
+installed
+
+=== 2026-10-29T19:11:20Z 3. frozen layer
+{
+ "intact": true,
+ "problems": []
+}
+
+=== 2026-10-29T19:11:20Z 4. data refresh
+ "yf_dxy": 4233,
+ "yf_spx": 4232
+}
+
+real	8m19.247s
+user	0m3.673s
+sys	0m0.088s
+
+=== 2026-10-29T19:19:39Z 5. unit + integration tests
+........................................................................ [ 84%]
+.............                                                            [100%]
+85 passed, 15 deselected in 2.64s
+
+=== 2026-10-29T19:19:42Z 6. config for this run (state in /tmp/btcagent-e2e/state)
+state_dir: /tmp/btcagent-e2e/state
+  email_enabled: false
+
+=== 2026-10-29T19:19:42Z 7. decision cycle 1 (live news -> reader, analyst x3, critic, policy, paper execution, ledger)
+
+real	18m42.272s
+user	0m4.429s
+sys	0m0.126s
+{'action': 'trade', 'final_weights': {'stable': 0.0, 'eth': 0.0}, 'nav_btc': 0.0012354757324340852, 'nav_usd': 99.76824827367643, 'strategy_version': 'cycle_guard_v2@v2'}
+analyst served: ['qwen3.8-flash-next', 'qwen3.8-flash-next', 'qwen3.8-flash-next']
+actions: [{"status": "filled", "fill": {"mode": "paper", "venue": "paper", "chain": null, "order_id": "paper-1793302704.610290", "symbol": "BTC/USDC", "side": "buy", "sell_asset": "USDC", "sell_qty": 100.0, "buy_asset": "BTC", "buy_qty": 0.0012354757324340852, "price": 80778.6, "price_quote": "USDC", "mid": 80778.55, "fee_asset": "BTC", "fee_qty": 2.4759032714109927e-06, "fee_usd": 0.19993636928592473, "gas_native": 0.0, "gas_usd": 0.0, "slippage_bps": 0.006189762010200775, "value_usd": 100.0, "price_btc_usd": 80752.9, "strategy_id": "cycle_guard_v2", "strategy_version": "cycle_guard_v2@v2", "decision_
+
+=== 2026-10-29T19:38:24Z 8. risk tick, daily upkeep, reflection on request
+{
+ "nav_btc": 0.0012354757324340852,
+ "nav_usd": 99.78542138635727
+}
+{
+ "forecasts_scored": 0,
+ "postmortems": 0,
+ "triggers": [],
+ "reflection": null
+}
+{
+ "result": "no_proposal"
+}
+
+=== 2026-10-29T19:38:45Z 9. evidence: models that served, GPU activity samples, ledger integrity, tax export
+events: {'deposit': 1, 'weekly': 1, 'model_call': 32, 'news_item': 25, 'policy_check': 1, 'fill': 1, 'alert': 1, 'decision': 1, 'forecast': 1, 'daily': 1, 'reflection': 1, 'gate_decision': 1}
+served models: {'reader:qwen3.6-35b-a3b': 25, 'analyst:qwen3.8-flash-next': 3, 'critic:qwen3.8-flash-next': 1, 'reflector:qwen3.8-flash-next': 3}
+ledger: (True, 'ok: 67 events, head 3cbf83b2fe564b73')
+GPU activity samples (GPU0..3, %):
+100 100 3 3 
+99 100 3 3 
+99 99 3 3 
+99 99 3 3 
+99 100 7 11 
+100 99 6 6 
+100 100 4 4 
+99 99 4 4 
+4 4 95 95 
+3 4 95 94 
+3 3 95 95 
+3 3 3 3 
+{
+ "rows": 1,
+ "out": "/tmp/btcagent-e2e/tax_sample.csv",
+ "summary": {
+  "rows": 1,
+  "neutral_swaps": 1,
+  "income_pln": 0.0,
+  "deductible_cost_pln": 0.0,
+  "non_deductible_fees_pln": 0.79,
+  "taxable_base_pln": 0.0
+ }
+}
+ts_utc,event_id,decision_id,mode,venue,chain,tx_hash_or_order_id,side,sell_asset,sell_qty,buy_asset,buy_qty,price,price_quote,fee_asset,fee_qty,fee_usd,gas_native,gas_usd,slippage_bps,value_usd,nbp_table_date,usd_pln,value_pln,fee_pln,tax_class,deductible_cost_pln,income_pln,strategy_id,strategy_version,playbook_version,model,reason_code
+2026-10-29T19:38:24.610344+00:00,ff9bc5ab-8d5e-4e6e-86b7-eeccaa917112,289644d2-87e8-4188-b7b7-351a70e6ffde,paper,paper,,paper-1793302704.610290,buy,USDC,100.0,BTC,0.0012354757324340852,80778.6,USDC,BTC,2.4759032714109927e-06,0.199936,0.0,0.0,0.006189762010200775,100.0,2026-10-28,3.9624,396.24,0.79,crypto_to_crypto_neutral,0.0,0.0,cycle_guard_v2,cycle_guard_v2@v2,1,rig:qwen3.8-flash-next,strategy
+{
+ "mode": "paper",
+ "nav_btc": 0.0012354757324340852,
+ "nav_usd": 99.80679511652839,
+ "weights": {
+  "BTC": 1.0
+ },
+ "holdings": [
+  {
+   "venue": "paper",
+   "asset": "BTC",
+   "qty": 0.0012354757324340852,
+   "protocol": null,
+   "chain": null
+  }
+ ],
+ "risk": {
+  "day": "2026-10-29",
+  "nav_btc_day_start": 0.001238345619785791,
+  "nav_btc_peak": 0.001238345619785791,
+  "nav_usd_peak": 100.0,
+  "at_rest": true,
+  "nav_btc": 0.0012354757324340852,
+  "nav_usd": 99.78542138635727,
+  "ts": "2026-10-29T19:38:25.228261+00:00",
+  "nav_btc_rest_peak": 0.0012354757324340852
+ },
+ "killed": null,
+ "halted": false,
+ "controller": "BOOTSTRAP",
+
+=== 2026-10-29T19:38:51Z done

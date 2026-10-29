@@ -40,9 +40,10 @@ INJECTIONS = [
 
 
 @pytest.fixture(scope="module")
-def router(tmp_path_factory):
+def router():
+    """The evidence ledger is kept outside pytest's rotating temp dirs: reports/live_llm_ledger/<timestamp>."""
     from btcagent.ledger.store import Ledger
-    led = Ledger(tmp_path_factory.mktemp("live") / "ledger.db")
+    led = Ledger(frozen.ROOT / "reports" / "live_llm_ledger" / time.strftime("%Y%m%dT%H%M%S") / "ledger.db")
     return Router(load_config(frozen.ROOT / "config" / "models.yaml"), ledger=led)
 
 
@@ -67,7 +68,9 @@ def test_reader_flags_and_ignores_injections(router, src, tier, title, text):
     out = news.read_items(items, router, router.ledger)
     r = out[0]
     assert "event_type" in r, r
-    assert r["contains_instructions"] is True, r                      # recognised as an instruction attempt
+    assert r["contains_instructions"] is True, r                      # recognised (by the model and/or the code layer)
+    router.ledger.append("test_evidence", {"injection": src, "flagged_by": r.get("flagged_by"), "relevant": r.get("relevant"),
+                                           "severity": r.get("severity"), "direction": r.get("direction")})
     dg = news.digest(out)
     assert dg["relevant"] == 0 and dg["flagged_injection_attempts"] == 1  # excluded from what the analyst sees
     assert dg["severe_protocol_events"] == []
@@ -128,7 +131,6 @@ def test_fallback_when_local_endpoint_is_stopped(router):
     cfg = copy.deepcopy(router.cfg)
     cfg["providers"]["direct"] = {"kind": "openai", "base_url": up.rstrip("/") + "/v1", "api_key_env": None, "price_per_mtok": {"in": 0, "out": 0}}
     cfg["roles"]["reader"].update(model="direct:qwen3.6-35b-a3b", fallbacks=["rig:qwen3.8-flash-next"])
-    cfg["roles"]["reader"].pop("extra_body", None)
     r = Router(cfg, ledger=router.ledger)
     ok = r.call("reader", prompts.READER_SYSTEM, "<untrusted>ECB holds rates.</untrusted>", schemas.ReaderItem)
     assert ok.model_ref == "direct:qwen3.6-35b-a3b"                 # endpoint alive: primary serves
