@@ -1,0 +1,249 @@
+{
+ "claims_total": 21,
+ "skipped_imprecise_date": 164,
+ "scored": 3,
+ "pending": 18,
+ "hit_rate_all": 1.0,
+ "by_asset_kind": {
+  "BTC/level_holds": {
+   "n": 3,
+   "hit_rate": 1.0
+  },
+  "_base_rates": {
+   "BTC": "base rate (up over 30 days): 0.567"
+  }
+ },
+ "rows": [
+  {
+   "date": "20261016",
+   "video": "-eKtrrN5P48",
+   "asset": "BTC_DOMINANCE",
+   "kind": "direction",
+   "direction": "up",
+   "horizon_days": 365,
+   "level": null,
+   "paraphrase": "BTC dominance likely to rise again in short term, targeting previous highs.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261016",
+   "video": "-eKtrrN5P48",
+   "asset": "BTC_DOMINANCE",
+   "kind": "level_reached",
+   "direction": "up",
+   "horizon_days": 365,
+   "level": null,
+   "paraphrase": "BTC dominance will rise and test 2025 highs before long-term decline.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261016",
+   "video": "-eKtrrN5P48",
+   "asset": "BTC_DOMINANCE",
+   "kind": "direction",
+   "direction": "down",
+   "horizon_days": 730,
+   "level": null,
+   "paraphrase": "BTC dominance will eventually decline below 50% after rate cuts.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261016",
+   "video": "-eKtrrN5P48",
+   "asset": "BTC_DOMINANCE",
+   "kind": "cycle_timing",
+   "direction": "up",
+   "horizon_days": 180,
+   "level": null,
+   "paraphrase": "BTC dominance likely to reach high in summer 2025 before policy eases.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261016",
+   "video": "-eKtrrN5P48",
+   "asset": "BTC_DOMINANCE",
+   "kind": "direction",
+   "direction": "up",
+   "horizon_days": 365,
+   "level": null,
+   "paraphrase": "Stablecoins support BTC dominance by preventing altcoin gains from shaking it.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261016",
+   "video": "-eKtrrN5P48",
+   "asset": "BTC_DOMINANCE",
+   "kind": "direction",
+   "direction": "up",
+   "horizon_days": 365,
+   "level": null,
+   "paraphrase": "BTC dominance expected to return to previous high values in short term.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261029",
+   "video": "21mBnslOLd0",
+   "asset": "BTC",
+   "kind": "direction",
+   "direction": "down",
+   "horizon_days": 90,
+   "level": null,
+   "paraphrase": "BTC crashes in Q4, potentially after a rally, driven by rising oil, long-term rates, and post-midterm election uncertainty.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261017",
+   "video": "H_JhpNaRPl8",
+   "asset": "BTC",
+   "kind": "level_reached",
+   "direction": "outperform",
+   "horizon_days": 64,
+   "level": null,
+   "paraphrase": "BTC will fall in Q4 (mid-late Dec) after rate hike, similar to S&P average behavior.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261017",
+   "video": "H_JhpNaRPl8",
+   "asset": "BTC",
+   "kind": "level_holds",
+   "direction": "up",
+   "horizon_days": 30,
+   "level": null,
+   "paraphrase": "BTC is holding above 50-day MA and 50-week MA, supporting bullish case.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261017",
+   "video": "H_JhpNaRPl8",
+   "asset": "BTC",
+   "kind": "relative_performance",
+   "direction": "down",
+   "horizon_days": 50,
+   "level": null,
+   "paraphrase": "BTC tends to fall after rate hikes, similar to S&P 500 historical average behavior.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261023",
+   "video": "KZ1Jro92t48",
+   "asset": "BTC",
+   "kind": "cycle_timing",
+   "direction": "up",
+   "horizon_days": 40,
+   "level": null,
+   "paraphrase": "Historical cycle suggests next local high for BTC between Oct 22 and Nov 3.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261023",
+   "video": "KZ1Jro92t48",
+   "asset": "BTC",
+   "kind": "relative_performance",
+   "direction": "up",
+   "horizon_days": 90,
+   "level": null,
+   "paraphrase": "BTC dominance likely to grow as riskier assets flow into less risky ones.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261023",
+   "video": "KZ1Jro92t48",
+   "asset": "BTC",
+   "kind": "cycle_timing",
+   "direction": "down",
+   "horizon_days": 90,
+   "level": null,
+   "paraphrase": "BTC often falls in Q4 of election years due to stock market drops.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261027",
+   "video": "bWdXPK3Hlok",
+   "asset": "BTC",
+   "kind": "level_reached",
+   "direction": "down",
+   "horizon_days": 60,
+   "level": null,
+   "paraphrase": "Bitcoin is likely to decline into the bull market support zone between $72,000 and $76,000 in the coming weeks.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261025",
+   "video": "eN6dpreDIk4",
+   "asset": "BTC",
+   "kind": "direction",
+   "direction": "down",
+   "horizon_days": 30,
+   "level": null,
+   "paraphrase": "Expect BTC high between Oct 21 and Nov 3 based on historical cycle patterns.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261023",
+   "video": "oYPawyUxnnE",
+   "asset": "BTC",
+   "kind": "level_holds",
+   "direction": "up",
+   "horizon_days": 7,
+   "level": null,
+   "paraphrase": "BTC holding above $83k; bears need few weekly closes below to change status quo.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261023",
+   "video": "oYPawyUxnnE",
+   "asset": "BTC_DOMINANCE",
+   "kind": "direction",
+   "direction": "up",
+   "horizon_days": 30,
+   "level": null,
+   "paraphrase": "BTC dominance approaching 61% and expected to grow due to altcoin weakness and tighter monetary policy.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261023",
+   "video": "oYPawyUxnnE",
+   "asset": "ETH",
+   "kind": "relative_performance",
+   "direction": "down",
+   "horizon_days": 7,
+   "level": null,
+   "paraphrase": "ETH below 50-day MA while BTC holds above, showing relative weakness vs BTC.",
+   "outcome": "pending"
+  },
+  {
+   "date": "20261016",
+   "video": "qWXGEl-ojx4",
+   "asset": "BTC",
+   "kind": "level_holds",
+   "direction": "up",
+   "horizon_days": 7,
+   "level": 83000.0,
+   "paraphrase": "BTC holds above 83k weekly close.",
+   "outcome": "hit"
+  },
+  {
+   "date": "20261016",
+   "video": "qWXGEl-ojx4",
+   "asset": "BTC",
+   "kind": "level_holds",
+   "direction": "up",
+   "horizon_days": 7,
+   "level": 83000.0,
+   "paraphrase": "BTC holds above 83k weekly close.",
+   "outcome": "hit"
+  },
+  {
+   "date": "20261016",
+   "video": "qWXGEl-ojx4",
+   "asset": "BTC",
+   "kind": "level_holds",
+   "direction": "up",
+   "horizon_days": 7,
+   "level": 83000.0,
+   "paraphrase": "BTC holds above 83k weekly close.",
+   "outcome": "hit"
+  }
+ ]
+}

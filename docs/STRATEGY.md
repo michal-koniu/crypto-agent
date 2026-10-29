@@ -20,6 +20,14 @@ The owner asked that the strategy learn from Benjamin Cowen and rely only on ver
 4-year cycle timing; diminishing returns; the 50-week SMA exit), weak on price levels and macro-driven tactics
 (lengthening cycles: falsified; "every midterm August −15 %": false).
 
+**Cowen claim ledger** (`scripts/cowen_claims.py`, `reports/cowen_claims_scored.json`): transcripts → dated,
+checkable claims extracted by the local reader model (enums, no tools; transcript text treated as untrusted) →
+scored by code against price history. YouTube IP-blocked the rig after ~50 transcript downloads, so on 2026-10-29
+it ran on 41 transcripts: 185 claims extracted, 164 skipped because the video's upload date was only approximate
+(the channel listing says "3 years ago"), 18 still pending (horizon not reached), 3 scored. That is far too few to
+say anything; the scored track record therefore remains research E's 27 calls dated from his own titles, posts and
+memos. The pipeline is resumable: `fetch` continues politely when YouTube allows, `score` re-runs as horizons pass.
+
 Research F (verifiable track records: Hyperliquid, GMX, dYdX, Polymarket on-chain histories) found no evidence that
 copying top accounts at low frequency beats a benchmark after costs (40,000 zero-skill accounts produce a best
 2-year Sharpe ≈ 3 by luck). It is not used; it could be added only as a pre-registered forward experiment.

@@ -8,8 +8,10 @@ with cloud models available through config only.
 > down their deviations from BTC, flag protocol risk, and propose small typed changes to itself. A frozen policy
 > engine, an independent signer, hard limits, allowlists and a hash-chained ledger sit outside its reach.
 
-**Status (2026-10-29):** paper and fork stages tested on the rig with live local models. **Live trading is disabled**
-(`frozen/limits.yaml: stage: paper`) and needs three human steps to enable ([docs/SETUP.md §6](docs/SETUP.md)).
+**Status (2026-10-30):** tested on the rig with live local models - 86 unit/integration, 19 fork, 9 live-LLM tests,
+a 5-phase self-improvement run, a fresh-install end-to-end run and a multi-hour soak with injected faults
+([docs/TEST_REPORT.md](docs/TEST_REPORT.md)). **Live trading is disabled** (`frozen/limits.yaml: stage: paper`) and
+needs three human steps to enable ([docs/SETUP.md §5](docs/SETUP.md)).
 
 ## What it does, in one picture
 
