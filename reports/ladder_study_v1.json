@@ -1,0 +1,1023 @@
+{
+ "date": "2026-10-30",
+ "n_trials": 22,
+ "data_to": "2026-10-28",
+ "variants": {
+  "A_champion": {
+   "btc_multiple": 1.547,
+   "per_cycle": {
+    "pre-2012": 1.0,
+    "2012-2016": 1.5352,
+    "2016-2020": 0.7421,
+    "2020-2024": 1.2941,
+    "2024-now": 1.0496
+   },
+   "summary": {
+    "start": "2011-06-26",
+    "end": "2026-10-28",
+    "years": 15.34,
+    "btc_multiple": 1.5474,
+    "btc_cagr": 0.0289,
+    "max_dd_btc": -0.7378,
+    "max_dd_usd": -0.8759,
+    "hodl_max_dd_usd": -0.8759,
+    "usd_multiple": 7682.918,
+    "hodl_usd_multiple": 4965.206,
+    "ann_vol_excess": 0.3254,
+    "sharpe_excess": 0.087,
+    "n_trades": 14,
+    "fees_btc": 0.038475,
+    "time_in_btc": 0.726,
+    "round_trips": 7,
+    "win_rate": 0.571,
+    "avg_round_trip_gain_btc": 0.0906
+   },
+   "trades": [
+    {
+     "date": "2014-08-24",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 508.43,
+     "notional_btc": 1.0,
+     "reason": "weekly"
+    },
+    {
+     "date": "2015-11-01",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 329.85,
+     "notional_btc": 1.5383,
+     "reason": "weekly"
+    },
+    {
+     "date": "2018-06-03",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 7702.16,
+     "notional_btc": 1.5352,
+     "reason": "weekly"
+    },
+    {
+     "date": "2019-05-12",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 6942.62,
+     "notional_btc": 1.7203,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-01-05",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 7345.53,
+     "notional_btc": 1.7168,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-01-19",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 8687.35,
+     "notional_btc": 1.4491,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-03-15",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 5358.61,
+     "notional_btc": 1.4462,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-03-24",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 6775.06,
+     "notional_btc": 1.1415,
+     "reason": "stable_stop"
+    },
+    {
+     "date": "2022-01-09",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 41886.5,
+     "notional_btc": 1.1393,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-04-03",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 46440.54,
+     "notional_btc": 1.0255,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-04-17",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 39704.78,
+     "notional_btc": 1.0234,
+     "reason": "weekly"
+    },
+    {
+     "date": "2023-03-26",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 28049.39,
+     "notional_btc": 1.4772,
+     "reason": "weekly"
+    },
+    {
+     "date": "2025-11-23",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 86872.45,
+     "notional_btc": 1.4743,
+     "reason": "weekly"
+    },
+    {
+     "date": "2026-09-27",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 84392.47,
+     "notional_btc": 1.5505,
+     "reason": "weekly"
+    }
+   ]
+  },
+  "B_ladder": {
+   "btc_multiple": 3.686,
+   "per_cycle": {
+    "pre-2012": 1.0,
+    "2012-2016": 1.4125,
+    "2016-2020": 1.2273,
+    "2020-2024": 1.7447,
+    "2024-now": 1.2187
+   },
+   "summary": {
+    "start": "2011-06-26",
+    "end": "2026-10-28",
+    "years": 15.34,
+    "btc_multiple": 3.6862,
+    "btc_cagr": 0.0888,
+    "max_dd_btc": -0.4387,
+    "max_dd_usd": -0.8759,
+    "hodl_max_dd_usd": -0.8759,
+    "usd_multiple": 18302.606,
+    "hodl_usd_multiple": 4965.206,
+    "ann_vol_excess": 0.21,
+    "sharpe_excess": 0.405,
+    "n_trades": 29,
+    "fees_btc": 0.060742,
+    "time_in_btc": 0.876,
+    "round_trips": 9,
+    "win_rate": 0.556,
+    "avg_round_trip_gain_btc": 0.1977
+   },
+   "trades": [
+    {
+     "date": "2014-08-24",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 508.43,
+     "notional_btc": 1.0,
+     "reason": "weekly"
+    },
+    {
+     "date": "2014-10-05",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 322.83,
+     "notional_btc": 0.3929,
+     "reason": "weekly"
+    },
+    {
+     "date": "2014-10-12",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 377.87,
+     "notional_btc": 0.3075,
+     "reason": "weekly"
+    },
+    {
+     "date": "2014-10-19",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 388.68,
+     "notional_btc": 0.3354,
+     "reason": "weekly"
+    },
+    {
+     "date": "2014-10-26",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 353.08,
+     "notional_btc": 0.3796,
+     "reason": "weekly"
+    },
+    {
+     "date": "2018-06-03",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 7702.16,
+     "notional_btc": 1.4125,
+     "reason": "weekly"
+    },
+    {
+     "date": "2018-11-18",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 5555.38,
+     "notional_btc": 0.4911,
+     "reason": "weekly"
+    },
+    {
+     "date": "2018-11-25",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 3946.85,
+     "notional_btc": 0.7922,
+     "reason": "weekly"
+    },
+    {
+     "date": "2018-12-02",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 4098.75,
+     "notional_btc": 0.6062,
+     "reason": "weekly"
+    },
+    {
+     "date": "2018-12-09",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 3540.44,
+     "notional_btc": 0.7283,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-01-05",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 7345.53,
+     "notional_btc": 2.6126,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-01-19",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 8687.35,
+     "notional_btc": 2.2051,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-03-15",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 5358.61,
+     "notional_btc": 2.2007,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-03-24",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 6775.06,
+     "notional_btc": 1.7371,
+     "reason": "stable_stop"
+    },
+    {
+     "date": "2022-01-09",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 41886.5,
+     "notional_btc": 1.7336,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-04-03",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 46440.54,
+     "notional_btc": 1.5605,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-04-17",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 39704.78,
+     "notional_btc": 1.5574,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-06-19",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 20492.3,
+     "notional_btc": 0.7531,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-06-26",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 21066.62,
+     "notional_btc": 0.7232,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-07-03",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 19276.51,
+     "notional_btc": 0.8406,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-07-10",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 20831.27,
+     "notional_btc": 0.7138,
+     "reason": "weekly"
+    },
+    {
+     "date": "2025-11-23",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 86872.45,
+     "notional_btc": 3.0246,
+     "reason": "weekly"
+    },
+    {
+     "date": "2026-08-02",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 63445.68,
+     "notional_btc": 1.0529,
+     "reason": "weekly"
+    },
+    {
+     "date": "2026-08-16",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 62818.41,
+     "notional_btc": 1.0715,
+     "reason": "weekly"
+    },
+    {
+     "date": "2026-08-23",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 77593.03,
+     "notional_btc": 0.2005,
+     "reason": "weekly"
+    },
+    {
+     "date": "2026-09-06",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 80319.97,
+     "notional_btc": 0.0318,
+     "reason": "weekly"
+    },
+    {
+     "date": "2026-09-13",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 76759.26,
+     "notional_btc": 0.0443,
+     "reason": "weekly"
+    },
+    {
+     "date": "2026-09-20",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 81194.74,
+     "notional_btc": 0.0522,
+     "reason": "weekly"
+    },
+    {
+     "date": "2026-09-27",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 84392.47,
+     "notional_btc": 1.8098,
+     "reason": "weekly"
+    }
+   ],
+   "gate": {
+    "must_pass": {
+     "2014-15 bear": {
+      "champion": 1.5352,
+      "challenger": 1.4125,
+      "ok": true
+     },
+     "2017-18 top and bear": {
+      "champion": 2.2384,
+      "challenger": 1.8496,
+      "ok": false
+     },
+     "2020 covid crash": {
+      "champion": 0.6649,
+      "challenger": 0.6649,
+      "ok": true
+     },
+     "2021-22 top and bear": {
+      "champion": 1.5491,
+      "challenger": 1.7447,
+      "ok": true
+     },
+     "2025-26 top and bear": {
+      "champion": 1.0496,
+      "challenger": 1.2187,
+      "ok": true
+     }
+    },
+    "passed": false,
+    "reasons": [
+     "must-pass window 2017-18 top and bear: 1.850 vs champion 2.238"
+    ],
+    "champion_multiple": 1.5474,
+    "challenger_multiple": 3.6862,
+    "champion_cycles": {
+     "pre-2012": 1.0,
+     "2012-2016": 1.5352,
+     "2016-2020": 0.7421,
+     "2020-2024": 1.2941,
+     "2024-now": 1.0496
+    },
+    "challenger_cycles": {
+     "pre-2012": 1.0,
+     "2012-2016": 1.4125,
+     "2016-2020": 1.2273,
+     "2020-2024": 1.7447,
+     "2024-now": 1.2187
+    },
+    "cycles_worse": [
+     "2012-2016"
+    ],
+    "bootstrap_p": 0.157,
+    "sign_test_cycles": {
+     "n": 4,
+     "wins": 3,
+     "p_one_sided": 0.3125
+    },
+    "deflated_sharpe": {
+     "sr": 0.057,
+     "sr0": 0.0687,
+     "dsr": 0.3598,
+     "t": 801
+    },
+    "challenger_summary": {
+     "start": "2011-06-26",
+     "end": "2026-10-28",
+     "years": 15.34,
+     "btc_multiple": 3.6862,
+     "btc_cagr": 0.0888,
+     "max_dd_btc": -0.4387,
+     "max_dd_usd": -0.8759,
+     "hodl_max_dd_usd": -0.8759,
+     "usd_multiple": 18302.606,
+     "hodl_usd_multiple": 4965.206,
+     "ann_vol_excess": 0.21,
+     "sharpe_excess": 0.405,
+     "n_trades": 29,
+     "fees_btc": 0.060742,
+     "time_in_btc": 0.876,
+     "round_trips": 9,
+     "win_rate": 0.556,
+     "avg_round_trip_gain_btc": 0.1977
+    }
+   }
+  },
+  "C_240d": {
+   "btc_multiple": 8.817,
+   "per_cycle": {
+    "pre-2012": 1.0,
+    "2012-2016": 2.1059,
+    "2016-2020": 1.4095,
+    "2020-2024": 2.1374,
+    "2024-now": 1.3897
+   },
+   "summary": {
+    "start": "2011-06-26",
+    "end": "2026-10-28",
+    "years": 15.34,
+    "btc_multiple": 8.8171,
+    "btc_cagr": 0.1525,
+    "max_dd_btc": -0.502,
+    "max_dd_usd": -0.8759,
+    "hodl_max_dd_usd": -0.8759,
+    "usd_multiple": 43778.888,
+    "hodl_usd_multiple": 4965.206,
+    "ann_vol_excess": 0.2939,
+    "sharpe_excess": 0.483,
+    "n_trades": 14,
+    "fees_btc": 0.109066,
+    "time_in_btc": 0.801,
+    "round_trips": 7,
+    "win_rate": 0.571,
+    "avg_round_trip_gain_btc": 0.4995
+   },
+   "trades": [
+    {
+     "date": "2014-08-24",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 508.43,
+     "notional_btc": 1.0,
+     "reason": "weekly"
+    },
+    {
+     "date": "2015-05-03",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 240.46,
+     "notional_btc": 2.1101,
+     "reason": "weekly"
+    },
+    {
+     "date": "2018-06-03",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 7702.16,
+     "notional_btc": 2.1059,
+     "reason": "weekly"
+    },
+    {
+     "date": "2019-02-10",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 3642.02,
+     "notional_btc": 4.4822,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-01-05",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 7345.53,
+     "notional_btc": 4.4733,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-01-19",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 8687.35,
+     "notional_btc": 3.7756,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-03-15",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 5358.61,
+     "notional_btc": 3.768,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-03-24",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 6775.06,
+     "notional_btc": 2.9743,
+     "reason": "stable_stop"
+    },
+    {
+     "date": "2022-01-09",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 41886.5,
+     "notional_btc": 2.9683,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-04-03",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 46440.54,
+     "notional_btc": 2.6719,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-04-17",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 39704.78,
+     "notional_btc": 2.6666,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-12-25",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 16824.84,
+     "notional_btc": 6.3572,
+     "reason": "weekly"
+    },
+    {
+     "date": "2025-11-23",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 86872.45,
+     "notional_btc": 6.3445,
+     "reason": "weekly"
+    },
+    {
+     "date": "2026-08-02",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 63445.68,
+     "notional_btc": 8.8348,
+     "reason": "weekly"
+    }
+   ],
+   "gate": {
+    "must_pass": {
+     "2014-15 bear": {
+      "champion": 1.5352,
+      "challenger": 2.1059,
+      "ok": true
+     },
+     "2017-18 top and bear": {
+      "champion": 2.2384,
+      "challenger": 2.2384,
+      "ok": true
+     },
+     "2020 covid crash": {
+      "champion": 0.6649,
+      "challenger": 0.6649,
+      "ok": true
+     },
+     "2021-22 top and bear": {
+      "champion": 1.5491,
+      "challenger": 2.1374,
+      "ok": true
+     },
+     "2025-26 top and bear": {
+      "champion": 1.0496,
+      "challenger": 1.3897,
+      "ok": true
+     }
+    },
+    "passed": true,
+    "reasons": [],
+    "champion_multiple": 1.5474,
+    "challenger_multiple": 8.8171,
+    "champion_cycles": {
+     "pre-2012": 1.0,
+     "2012-2016": 1.5352,
+     "2016-2020": 0.7421,
+     "2020-2024": 1.2941,
+     "2024-now": 1.0496
+    },
+    "challenger_cycles": {
+     "pre-2012": 1.0,
+     "2012-2016": 2.1059,
+     "2016-2020": 1.4095,
+     "2020-2024": 2.1374,
+     "2024-now": 1.3897
+    },
+    "cycles_worse": [],
+    "bootstrap_p": 0.001,
+    "sign_test_cycles": {
+     "n": 4,
+     "wins": 4,
+     "p_one_sided": 0.0625
+    },
+    "deflated_sharpe": {
+     "sr": 0.0706,
+     "sr0": 0.0688,
+     "dsr": 0.5217,
+     "t": 801
+    },
+    "challenger_summary": {
+     "start": "2011-06-26",
+     "end": "2026-10-28",
+     "years": 15.34,
+     "btc_multiple": 8.8171,
+     "btc_cagr": 0.1525,
+     "max_dd_btc": -0.502,
+     "max_dd_usd": -0.8759,
+     "hodl_max_dd_usd": -0.8759,
+     "usd_multiple": 43778.888,
+     "hodl_usd_multiple": 4965.206,
+     "ann_vol_excess": 0.2939,
+     "sharpe_excess": 0.483,
+     "n_trades": 14,
+     "fees_btc": 0.109066,
+     "time_in_btc": 0.801,
+     "round_trips": 7,
+     "win_rate": 0.571,
+     "avg_round_trip_gain_btc": 0.4995
+    }
+   }
+  },
+  "D_ladder_240d": {
+   "btc_multiple": 4.203,
+   "per_cycle": {
+    "pre-2012": 1.0,
+    "2012-2016": 1.4125,
+    "2016-2020": 1.2273,
+    "2020-2024": 1.7447,
+    "2024-now": 1.3897
+   },
+   "summary": {
+    "start": "2011-06-26",
+    "end": "2026-10-28",
+    "years": 15.34,
+    "btc_multiple": 4.2034,
+    "btc_cagr": 0.0981,
+    "max_dd_btc": -0.4387,
+    "max_dd_usd": -0.8759,
+    "hodl_max_dd_usd": -0.8759,
+    "usd_multiple": 20870.521,
+    "hodl_usd_multiple": 4965.206,
+    "ann_vol_excess": 0.2089,
+    "sharpe_excess": 0.448,
+    "n_trades": 23,
+    "fees_btc": 0.060639,
+    "time_in_btc": 0.882,
+    "round_trips": 7,
+    "win_rate": 0.571,
+    "avg_round_trip_gain_btc": 0.2581
+   },
+   "trades": [
+    {
+     "date": "2014-08-24",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 508.43,
+     "notional_btc": 1.0,
+     "reason": "weekly"
+    },
+    {
+     "date": "2014-10-05",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 322.83,
+     "notional_btc": 0.3929,
+     "reason": "weekly"
+    },
+    {
+     "date": "2014-10-12",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 377.87,
+     "notional_btc": 0.3075,
+     "reason": "weekly"
+    },
+    {
+     "date": "2014-10-19",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 388.68,
+     "notional_btc": 0.3354,
+     "reason": "weekly"
+    },
+    {
+     "date": "2014-10-26",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 353.08,
+     "notional_btc": 0.3796,
+     "reason": "weekly"
+    },
+    {
+     "date": "2018-06-03",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 7702.16,
+     "notional_btc": 1.4125,
+     "reason": "weekly"
+    },
+    {
+     "date": "2018-11-18",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 5555.38,
+     "notional_btc": 0.4911,
+     "reason": "weekly"
+    },
+    {
+     "date": "2018-11-25",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 3946.85,
+     "notional_btc": 0.7922,
+     "reason": "weekly"
+    },
+    {
+     "date": "2018-12-02",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 4098.75,
+     "notional_btc": 0.6062,
+     "reason": "weekly"
+    },
+    {
+     "date": "2018-12-09",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 3540.44,
+     "notional_btc": 0.7283,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-01-05",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 7345.53,
+     "notional_btc": 2.6126,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-01-19",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 8687.35,
+     "notional_btc": 2.2051,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-03-15",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 5358.61,
+     "notional_btc": 2.2007,
+     "reason": "weekly"
+    },
+    {
+     "date": "2020-03-24",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 6775.06,
+     "notional_btc": 1.7371,
+     "reason": "stable_stop"
+    },
+    {
+     "date": "2022-01-09",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 41886.5,
+     "notional_btc": 1.7336,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-04-03",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 46440.54,
+     "notional_btc": 1.5605,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-04-17",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 39704.78,
+     "notional_btc": 1.5574,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-06-19",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 20492.3,
+     "notional_btc": 0.7531,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-06-26",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 21066.62,
+     "notional_btc": 0.7232,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-07-03",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 19276.51,
+     "notional_btc": 0.8406,
+     "reason": "weekly"
+    },
+    {
+     "date": "2022-07-10",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 20831.27,
+     "notional_btc": 0.7138,
+     "reason": "weekly"
+    },
+    {
+     "date": "2025-11-23",
+     "leg": "STABLE",
+     "side": "buy",
+     "btc_usd": 86872.45,
+     "notional_btc": 3.0246,
+     "reason": "weekly"
+    },
+    {
+     "date": "2026-08-02",
+     "leg": "STABLE",
+     "side": "sell",
+     "btc_usd": 63445.68,
+     "notional_btc": 4.2118,
+     "reason": "weekly"
+    }
+   ],
+   "gate": {
+    "must_pass": {
+     "2014-15 bear": {
+      "champion": 1.5352,
+      "challenger": 1.4125,
+      "ok": true
+     },
+     "2017-18 top and bear": {
+      "champion": 2.2384,
+      "challenger": 1.8496,
+      "ok": false
+     },
+     "2020 covid crash": {
+      "champion": 0.6649,
+      "challenger": 0.6649,
+      "ok": true
+     },
+     "2021-22 top and bear": {
+      "champion": 1.5491,
+      "challenger": 1.7447,
+      "ok": true
+     },
+     "2025-26 top and bear": {
+      "champion": 1.0496,
+      "challenger": 1.3897,
+      "ok": true
+     }
+    },
+    "passed": false,
+    "reasons": [
+     "must-pass window 2017-18 top and bear: 1.850 vs champion 2.238"
+    ],
+    "champion_multiple": 1.5474,
+    "challenger_multiple": 4.2034,
+    "champion_cycles": {
+     "pre-2012": 1.0,
+     "2012-2016": 1.5352,
+     "2016-2020": 0.7421,
+     "2020-2024": 1.2941,
+     "2024-now": 1.0496
+    },
+    "challenger_cycles": {
+     "pre-2012": 1.0,
+     "2012-2016": 1.4125,
+     "2016-2020": 1.2273,
+     "2020-2024": 1.7447,
+     "2024-now": 1.3897
+    },
+    "cycles_worse": [
+     "2012-2016"
+    ],
+    "bootstrap_p": 0.1375,
+    "sign_test_cycles": {
+     "n": 4,
+     "wins": 3,
+     "p_one_sided": 0.3125
+    },
+    "deflated_sharpe": {
+     "sr": 0.0634,
+     "sr0": 0.0687,
+     "dsr": 0.434,
+     "t": 801
+    },
+    "challenger_summary": {
+     "start": "2011-06-26",
+     "end": "2026-10-28",
+     "years": 15.34,
+     "btc_multiple": 4.2034,
+     "btc_cagr": 0.0981,
+     "max_dd_btc": -0.4387,
+     "max_dd_usd": -0.8759,
+     "hodl_max_dd_usd": -0.8759,
+     "usd_multiple": 20870.521,
+     "hodl_usd_multiple": 4965.206,
+     "ann_vol_excess": 0.2089,
+     "sharpe_excess": 0.448,
+     "n_trades": 23,
+     "fees_btc": 0.060639,
+     "time_in_btc": 0.882,
+     "round_trips": 7,
+     "win_rate": 0.571,
+     "avg_round_trip_gain_btc": 0.2581
+    }
+   }
+  }
+ }
+}

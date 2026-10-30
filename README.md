@@ -1,4 +1,4 @@
-# btc-agent
+# Crypto agent (`btc-agent`)
 
 An autonomous agent that manages a crypto portfolio with one objective: **grow its value measured in BTC**.
 The benchmark is simply holding BTC. Built to run 24/7 on a home rig with local LLMs (4× Radeon AI PRO R9700),
@@ -8,9 +8,9 @@ with cloud models available through config only.
 > down their deviations from BTC, flag protocol risk, and propose small typed changes to itself. A frozen policy
 > engine, an independent signer, hard limits, allowlists and a hash-chained ledger sit outside its reach.
 
-**Status (2026-10-30):** tested on the rig with live local models - 86 unit/integration, 19 fork, 9 live-LLM tests,
-a 5-phase self-improvement run, a fresh-install end-to-end run and a multi-hour soak with injected faults
-([docs/TEST_REPORT.md](docs/TEST_REPORT.md)). **Live trading is disabled** (`frozen/limits.yaml: stage: paper`) and
+**Status (2026-10-30):** tested on the rig with live local models - 101 unit/integration (incl. signer), 7 fork, 9 live-LLM tests,
+a 5-phase self-improvement run, a fresh-install end-to-end run and a 6-hour soak with four injected faults (exchange
+outage, model outage, `kill -9`, restart) ([docs/TEST_REPORT.md](docs/TEST_REPORT.md)). **Live trading is disabled** (`frozen/limits.yaml: stage: paper`) and
 needs three human steps to enable ([docs/SETUP.md §5](docs/SETUP.md)).
 
 ## What it does, in one picture

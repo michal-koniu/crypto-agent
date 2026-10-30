@@ -75,3 +75,28 @@ accountant (unsettled PIT treatment, research A). Keep the CSV and the ledger un
 The state directory is the system of record: copy `~/.local/state/btcagent/` (ledger.db + ledger.jsonl + JSON state)
 daily, e.g. `rsync -a ~/.local/state/btcagent/ /mnt/backup/btcagent/`. The keystore (live stage) is encrypted; its
 password lives only in Bitwarden.
+
+## 7. Strategy changes: propose, watch, withdraw (human)
+The agent changes its own strategy only through the gates (SELF_IMPROVEMENT.md). You can feed the same pipeline:
+
+```bash
+.venv/bin/btcagent propose --target cycle_guard.<param> --value <v> --hypothesis "..." --evidence <files>
+.venv/bin/btcagent status                 # controller state, in-flight challenger, probation
+.venv/bin/btcagent ledger tail            # gate_decision / change / probation / rollback events
+.venv/bin/btcagent withdraw --why "..."   # cancel the challenger in shadow, or roll back a promotion on probation
+```
+
+A proposal runs static → must-pass windows → full history (per cycle, bootstrap, deflated Sharpe) → shadow 4–12
+weeks → promotion (git commit of `evolvable/strategies.yaml`) → probation. A challenger that never acts differently
+from the champion runs the full 12 weeks and is promoted on offline evidence only (flagged in the ledger); its
+probation keeps the old champion in shadow with automatic rollback armed until the two have differed for 12 weeks.
+`withdraw` is logged and does not count as a rejection. **In flight since 2026-10-30:**
+`cycle_guard.max_days_in_stable 450 → 240` (STRATEGY.md §7).
+
+## 8. Protocol-status guard
+Every risk tick (and before every deposit) the agent reads the lending reserve's own flags on chain
+(`btcagent/risk/protocol_status.py`; paper mode via `protocol_status.rpc_url`, fork/live via the executor's RPC; cached
+5 minutes). Ledger events: `protocol_status` (every change of state), `protocol_exit` (withdrawal after a freeze).
+Alerts: warning on frozen/inactive, critical on paused (withdrawals impossible). **As of 30 Oct 2026 every Aave v3
+Base reserve is frozen on mainnet** — the stable leg stays liquid until it is unfrozen or the owner allowlists another
+venue (frozen layer: `allowlists.yaml`, then `btcagent risk-check` first).

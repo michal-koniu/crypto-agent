@@ -61,6 +61,8 @@ def main(argv=None):
     st = sub.add_parser("state", help="controller state change (human only): BOOTSTRAP -> GATED etc.")
     st.add_argument("to", choices=["BOOTSTRAP", "GATED", "MAINTENANCE"])
     st.add_argument("--why", default="human decision")
+    wd = sub.add_parser("withdraw", help="cancel the challenger in shadow, or roll back a promotion on probation (human only)")
+    wd.add_argument("--why", required=True)
     args = ap.parse_args(argv)
 
     if args.cmd == "frozen":
@@ -164,6 +166,8 @@ def main(argv=None):
         panel, feat = agent.panel()
         print(json.dumps(agent.loop.propose_and_gate(datetime.now(timezone.utc), feat, panel, {"human_request"}, forced=prop),
                          indent=1, default=str)[:20000])
+    elif args.cmd == "withdraw":
+        print(json.dumps(agent.loop.withdraw(datetime.now(timezone.utc), args.why), indent=1))
     elif args.cmd == "state":
         agent.loop.ctrl.set_state(args.to, args.why)
         agent.loop.ctrl.save()

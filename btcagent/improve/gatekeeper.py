@@ -38,11 +38,22 @@ def champion_params(cfg: dict) -> dict:
     return p
 
 
+def as_bool(x) -> bool:
+    """Strict boolean parsing: model output may carry "false" as a string, and bool("false") is True."""
+    if isinstance(x, bool):
+        return x
+    if isinstance(x, (int, float)) and x in (0, 1):
+        return bool(x)
+    if isinstance(x, str) and x.strip().lower() in ("true", "false", "1", "0", "yes", "no", "on", "off"):
+        return x.strip().lower() in ("true", "1", "yes", "on")
+    raise ValueError(f"not a boolean: {x!r}")
+
+
 def apply_proposal_to_params(params: dict, prop: Proposal) -> dict:
     p = copy.deepcopy(params)
     if prop.op == "PARAM_CHANGE":
         group, key = prop.target.split(".", 1)
-        p[group][key] = type(p[group][key])(prop.new_value) if not isinstance(p[group][key], bool) else bool(prop.new_value)
+        p[group][key] = type(p[group][key])(prop.new_value) if not isinstance(p[group][key], bool) else as_bool(prop.new_value)
     elif prop.op == "DISABLE_ALT_GATE":
         p["alt_gate"]["enabled"] = False
     elif prop.op == "ENABLE_ALT_GATE":
@@ -84,14 +95,17 @@ def static_gate(prop: Proposal, cfg: dict, ledger: Ledger | None = None) -> list
             v.append(f"{prop.target} has no bounds in frozen/param_bounds.yaml (not evolvable)")
         else:
             lo, hi = bounds[group][key]
+            is_bool = isinstance(lo, bool)
             try:
-                val = float(prop.new_value) if not isinstance(lo, bool) else prop.new_value
+                val = float(prop.new_value) if not is_bool else as_bool(prop.new_value)
             except (TypeError, ValueError):
-                return v + [f"value {prop.new_value!r} is not a number"]
-            if not isinstance(lo, bool) and not (lo <= val <= hi):
+                return v + [f"value {prop.new_value!r} is not a {'boolean' if is_bool else 'number'}"]
+            if not is_bool and not (lo <= val <= hi):
                 v.append(f"{prop.target}={val} outside bounds [{lo}, {hi}]")
-            cur = cfg["strategies"][cfg["champion"]][group][key]
-            if not isinstance(lo, bool) and math.isclose(float(cur), float(val)):
+            cur = cfg["strategies"][cfg["champion"]][group].get(key)
+            if cur is None:
+                v.append(f"{prop.target} is not a parameter of the champion")
+            elif (as_bool(cur) == val) if is_bool else math.isclose(float(cur), float(val)):
                 v.append("no change from the current value")
     if prop.op.startswith("PLAYBOOK") and not prop.target and prop.op != "PLAYBOOK_ADD":
         v.append("playbook MODIFY/RETIRE need an item id")
@@ -143,10 +157,15 @@ def backtest_gate(champ: dict, chall: dict, feat, daily, n_trials: int) -> dict:
 
 
 # ------------------------------------------------------------------ gate 4: shadow
-def shadow_decision(weeks: int, champ_nav: float, chall_nav: float) -> str:
+def shadow_decision(weeks: int, champ_nav: float, chall_nav: float, diverged: bool = True) -> str:
+    """diverged: the challenger's virtual NAV has differed from the champion's at some week of the shadow. A challenger
+    that never acted differently is not evidence of anything: it runs to max_weeks, then is promoted on the offline
+    evidence alone ("promote:offline_evidence_only"), with its probation waiting for real divergence."""
     s = frozen.gate_rules()["shadow"]
     if weeks < s["min_weeks"]:
         return "continue"
+    if not diverged:
+        return "promote:offline_evidence_only" if weeks >= s["max_weeks"] else "continue"
     if chall_nav >= champ_nav * (1 - s["non_inferiority"]):
         return "promote"
     if weeks >= s["max_weeks"]:
@@ -176,6 +195,17 @@ def probation_check(weekly_log_diffs: list[float]) -> tuple[bool, str]:
     if cum < math.log(1 - pr["max_underperformance"]):
         return True, f"cumulative underperformance {math.exp(cum) - 1:.2%}"
     return False, "ok"
+
+
+def probation_progress(weekly_log_diffs: list[float]) -> dict:
+    """done: probation can end; dormant: enough calendar weeks have passed but the new and old champions have not yet
+    differed for long enough - the rollback watch stays armed, only playbook/judgment changes may proceed."""
+    rules = frozen.gate_rules()
+    pr, eps = rules["probation"], rules["shadow"]["divergence_epsilon"]
+    div = sum(1 for x in weekly_log_diffs if abs(x) > eps)
+    done = (div if pr.get("require_divergent_weeks") else len(weekly_log_diffs)) >= pr["weeks"]
+    return {"weeks": len(weekly_log_diffs), "divergent_weeks": div, "done": done,
+            "dormant": not done and len(weekly_log_diffs) >= pr["weeks"]}
 
 
 # ------------------------------------------------------------------ versioned writes (the only writes it makes)

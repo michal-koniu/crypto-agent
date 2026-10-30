@@ -28,12 +28,21 @@ shadow:             # challenger and champion run side by side on live data; onl
   min_weeks: 4
   max_weeks: 12                       # no decision by then -> keep the champion (status-quo bias)
   non_inferiority: 0.01               # challenger virtual NAV >= champion virtual NAV * (1 - this)
+  divergence_epsilon: 0.0001          # |log(challenger / champion)| below this = the challenger has not acted differently
+  # A challenger that never acted differently has produced no forward evidence (course rule 1). It is not promoted at
+  # min_weeks: it runs to max_weeks and is then promoted on the offline evidence alone, flagged as such in the ledger,
+  # and its probation waits for real divergence (below).
   judgment_min_scored_forecasts: 10   # playbook judgment changes: Brier score, paired, on >= this many forecasts
 
 probation:
   weeks: 12
   page_hinkley: {delta: 0.002, lambda: 0.03}   # on weekly log(new / old-champion-shadow)
   max_underperformance: 0.03          # cumulative; beyond -> automatic rollback
+  require_divergent_weeks: true       # probation passes only after `weeks` weeks in which new and old actually differed
+                                      # (|weekly log diff| > shadow.divergence_epsilon); until then the old champion
+                                      # stays in shadow and the automatic rollback stays armed.
+  # After `weeks` calendar weeks without enough divergence the probation is "dormant": playbook/judgment changes may
+  # be proposed again; parameter changes stay blocked, because a rollback must never undo a later change.
 
 controller:
   base_reflection_interval_days: 7

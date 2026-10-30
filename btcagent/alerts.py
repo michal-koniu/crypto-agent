@@ -29,7 +29,7 @@ class Alerts:
         self._last[kind] = now
         delivered = []
         if not self.dry_run and self.cfg.get("email_enabled") and self.cfg.get("email_to"):
-            delivered.append(("email", self._email(f"[btc-agent {level}] {subject}", body)))
+            delivered.append(("email", self._email(f"[crypto agent {level}] {subject}", body)))
         if not self.dry_run and self.cfg.get("telegram_enabled"):
             delivered.append(("telegram", self._telegram(f"[{level}] {subject}\n{body}")))
         self.ledger.append("alert", {"kind": kind, "level": level, "subject": subject, "body": body[:2000],

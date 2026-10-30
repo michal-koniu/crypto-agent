@@ -44,7 +44,7 @@ class Controller:
     def may_reflect(self, now: datetime, triggers: set[str]) -> tuple[bool, str]:
         if self.s.in_flight:
             return False, "a challenger is already in flight (one change at a time)"
-        if self.s.probation:
+        if self.s.probation and not self.s.probation.get("dormant"):
             return False, "the last promotion is on probation"
         if not triggers:
             return False, "no evidence-gated trigger"

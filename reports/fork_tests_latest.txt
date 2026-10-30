@@ -1,2 +1,5 @@
-...................                                                      [100%]
-19 passed in 119.12s (0:01:59)
+Fri Oct 30 01:21:57 AM UTC 2026
+anvil fork of Base at block 53266885 on 127.0.0.1:8545
+.......                                                                  [100%]
+7 passed in 154.83s (0:02:34)
+stopped

@@ -18,6 +18,7 @@ cycle_guard:
   reclaim_weeks: [1, 6]
   max_days_in_stable: [180, 730]
   stable_stop_btc_pct: [0.05, 0.20]      # never looser than frozen limits.loss.max_stop_distance_pct
+  ladder_after_exit: [false, true]       # let the re-entry ladder fire while BTC is still below the 50W (STRATEGY §7)
 alt_gate:
   enabled: [false, true]
   eth_weight: [0.0, 0.15]                 # never above frozen limits.position.max_asset_weight.ALT

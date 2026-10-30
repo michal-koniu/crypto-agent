@@ -40,6 +40,11 @@ yield:
   expected_apy: 0.05
   lockup_hours: 0
 
+protocol_status:                 # deterministic guard (btcagent/risk/protocol_status.py): reserve flags before deposits, every tick
+  enabled: true
+  rpc_url: https://mainnet.base.org   # read-only; paper mode mirrors the real Aave reserve flags; fork/live use the executor's RPC
+  ttl_seconds: 300
+
 analyst:
   enabled: true                  # false = rules only (the validated strategy without any LLM overlay)
   samples: 3

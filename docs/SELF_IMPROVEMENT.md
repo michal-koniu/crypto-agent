@@ -8,7 +8,7 @@ deviation or extension is listed with its justification in §3.
 
 | # | Course rule | Where it lives | How it is enforced / tested |
 |---|---|---|---|
-| 1 | Never treat "nothing found" as evidence | `improve/controller.py` triggers; `llm/prompts.py` ("doing nothing is legitimate") | a quiet week opens no reflection (`test_controller_one_in_flight_backoff_and_maintenance`); `decision.action = none` is a normal, logged outcome |
+| 1 | Never treat "nothing found" as evidence | `improve/controller.py` triggers; `llm/prompts.py` ("doing nothing is legitimate"); `gatekeeper.shadow_decision(diverged=…)` and `probation_progress` | a quiet week opens no reflection (`test_controller_one_in_flight_backoff_and_maintenance`); `decision.action = none` is a normal, logged outcome; **a shadow or probation in which the two strategies never behaved differently counts as no evidence** (`test_shadow_without_divergence_is_not_evidence`, `test_probation_waits_for_real_divergence`, `test_loop_identical_challenger_promoted_late_and_rollback_stays_armed`) |
 | 2 | Accept the arithmetic of rare events | §2 below (our "hits" are trades: ~0.5 per month) | online A/B on trades is never used to *prove* an improvement; offline history + shadow non-inferiority + probation instead |
 | 3 | The LLM proposes; code and statistics dispose | reflector emits one `Proposal`; `improve/gatekeeper.py` decides | gatekeeper is frozen code; no LLM call inside it |
 | 4 | Freeze the measurement layer by construction | `frozen/` + `frozen/frozen.lock` hashes the metrics, ledger, gate rules, policy, signer, sentinel | `verify_lock()` before every cycle; tampering → kill switch (halt_only); `test_frozen_lock_detects_tampering` |
@@ -40,6 +40,16 @@ change helped** within any reasonable time (02 §2). Consequences, all implement
   cycle, with must-pass stress windows - the course's "evaluate whatever you can offline, on frozen data" (02 §3).
 * The online door is **non-inferiority**, not superiority: a shadow challenger must not fall behind the champion by
   more than 1 % over 4–12 weeks; reaching 12 weeks without a decision keeps the champion (status-quo bias, 03 §6).
+* **Identical weeks are not evidence (rule 1).** Most strategy parameters only matter in rare states (e.g.
+  `max_days_in_stable` only while out of BTC), so a challenger can run 12 weeks without ever acting differently. Such
+  a challenger is not promoted at 4 weeks; at 12 weeks it is promoted on the offline evidence alone, flagged
+  `evidence: offline_only_no_divergence_in_shadow`. Its probation then counts only **divergent** weeks
+  (|weekly log difference| > 0.0001): the old champion stays in shadow and the automatic rollback stays armed until
+  the two have differed for 12 weeks — i.e. until the change has actually been exercised in the market state it was
+  made for. After 12 calendar weeks the probation turns *dormant*: playbook/judgment changes may be proposed again,
+  strategy parameter changes stay blocked (a rollback must never silently undo a later change). Found in the final
+  review on 2026-10-30: before this fix, `shadow_decision(4, 1.0, 1.0)` promoted an identical challenger and a
+  12-week identical probation disarmed the rollback.
 * The dense signal (02 §3, "denser leading indicators") is the analyst's **probabilistic forecasts** (7-day and
   30-day P(BTC up)), scored with Brier scores daily. They feed lesson counters and the judgment shadow test.
 * The expected number of validated strategy changes is **a few per year**; the controller reaches MAINTENANCE fast.
@@ -66,8 +76,8 @@ change helped** within any reasonable time (02 §2). Consequences, all implement
  weekly upkeep: shadow books step; ≥3 same-class post-mortems / sentinel divergence / scheduled review = trigger
    └─► controller: one in flight? probation? backoff? maintenance? ─► reflector (3 samples, majority) ─► Proposal
          └─► static gate ─► must-pass windows ─► full-history per-cycle + bootstrap (+ DSR reported)
-               └─► shadow (4–12 weeks, non-inferiority) ─► promote: new version + git commit + old champion kept in shadow
-                     └─► probation 12 weeks: Page–Hinkley / −3 % ─► automatic ROLLBACK (version + ledger + alert)
+               └─► shadow (4–12 weeks, non-inferiority; no divergence → 12 weeks, offline-only flag) ─► promote: new version + git commit + old champion kept in shadow
+                     └─► probation 12 *divergent* weeks: Page–Hinkley / −3 % ─► automatic ROLLBACK (version + ledger + alert)
 ```
 
 Every arrow is a ledger event (`postmortem`, `lesson_added`, `reflection`, `proposal`, `gate_decision`, `change`,

@@ -21,7 +21,13 @@ from pathlib import Path
 from .. import frozen
 from ..ledger.store import Ledger
 from . import keystore
-from .policy import SignRequest, check_cex_order, check_tx
+from .policy import SEL_APPROVE, SEL_WITHDRAW, SignRequest, check_cex_order, check_tx
+
+# Exits while the kill switch is engaged, and calls that only reduce risk (Aave withdraw to our own wallet, approve-to-
+# zero), are never blocked by the normal order-rate cap: an emergency must not fail because the last hour was busy.
+# They count against their own, bounded ceiling instead (found in the final review: the kill drill on the fork was
+# refused with "signer rate limit reached" after a protocol-guard withdrawal).
+EMERGENCY_SIGNATURES_PER_HOUR = 60
 
 
 class Signer:
@@ -36,6 +42,7 @@ class Signer:
         self.account = keystore.load(keystore_path) if keystore_path else None
         self.address = self.account.address if self.account else None
         self._times: list[float] = []
+        self._emergency_times: list[float] = []
         self._lock = threading.Lock()
         self._cex = {}
 
@@ -43,15 +50,24 @@ class Signer:
     def killed(self) -> bool:
         return (self.state / "KILL").exists()
 
-    def _rate_ok(self) -> bool:
-        cap = self.limits["rate"]["max_orders_per_hour"] * 4      # swaps plus their approvals and revokes
+    def _rate_ok(self, emergency: bool = False) -> bool:
+        cap = EMERGENCY_SIGNATURES_PER_HOUR if emergency else self.limits["rate"]["max_orders_per_hour"] * 4   # swaps + approvals + revokes
         now = time.time()
         with self._lock:
-            self._times = [t for t in self._times if now - t < 3600]
-            if len(self._times) >= cap:
+            times = self._emergency_times if emergency else self._times
+            times[:] = [t for t in times if now - t < 3600]
+            if len(times) >= cap:
                 return False
-            self._times.append(now)
+            times.append(now)
             return True
+
+    @staticmethod
+    def _derisking(req: SignRequest) -> bool:
+        """Calls that can only reduce risk; check_tx has already verified recipient/allowlists."""
+        sel = req.data[:10].lower()
+        if sel == SEL_WITHDRAW:
+            return True
+        return sel == SEL_APPROVE and len(req.data) >= 138 and int(req.data[-64:], 16) == 0
 
     def sign_tx(self, body: dict) -> tuple[int, dict]:
         if not self.account:
@@ -61,10 +77,11 @@ class Signer:
         v = check_tx(req, self.address, self.allow, self.limits, self.killed)
         if self.mode == "live" and self.limits.get("stage") != "live":
             v.append("signer: frozen stage is not live")
-        if not v and not self._rate_ok():
-            v.append("signer rate limit reached")
+        emergency = self.killed or self._derisking(req)
+        if not v and not self._rate_ok(emergency):
+            v.append("signer rate limit reached" + (" (emergency ceiling)" if emergency else ""))
         rec = {"chain": req.chain, "to": req.to, "selector": req.data[:10], "nonce": body.get("nonce"),
-               "allowed": not v, "violations": v, "killed": self.killed}
+               "allowed": not v, "violations": v, "killed": self.killed, "rate_bucket": "emergency" if emergency else "normal"}
         if v:
             self.journal.append("sign_refused", rec)
             return 403, {"violations": v}
@@ -100,7 +117,7 @@ class Signer:
             v.append(f"signer: real CEX orders need mode live (or the venue's demo flag); mode is {self.mode}")
         if self.mode == "live" and self.limits.get("stage") != "live":
             v.append("signer: frozen stage is not live")
-        if not v and not self._rate_ok():
+        if not v and not self._rate_ok(emergency=self.killed):
             v.append("signer rate limit reached")
         rec = {k: body.get(k) for k in ("venue", "symbol", "side", "type", "amount", "price", "notional_usd")}
         if v:

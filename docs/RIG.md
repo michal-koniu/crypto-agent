@@ -11,7 +11,7 @@ Discovered through rig-agent (not assumed): `curl localhost:8080/v1/models`, the
 
 ## Served models (llama-swap on :8080, OpenAI-compatible, no key)
 
-| llama-swap id | Engine, GPUs | Speed (1 agent) | Context | Used by btc-agent as |
+| llama-swap id | Engine, GPUs | Speed (1 agent) | Context | Used by the crypto agent as |
 |---|---|---:|---:|---|
 | `qwen3.8-flash-next` | radiance, GPU 0+1 | 118–145 tok/s | 200k | **analyst, reflector** (thinking on) |
 | `qwen3.6-35b-a3b` | vLLM FP8, GPU 2+3 | 138–172 tok/s | 131k | **critic, reader, triage** (thinking off) |

@@ -75,8 +75,13 @@ as a hypothesis for the self-improvement loop, not adopted - adopting it now wou
    exit until a fresh close above the 50W (no whipsaw loop).
 2. **Analyst** (daily, three samples, median): conviction in [0,1] on the rules' stable share (and ETH share, off),
    protocol-risk exits, forecasts; key macro factors named. **Critic** (other model) can only lower conviction.
-3. **Yield:** while holding USDC, it is lent on Aave v3 (Base) / Earn equivalents; withdrawn first whenever BTC is
-   bought back, and immediately on a severe protocol event.
+3. **Yield:** while holding USDC, up to the frozen 60 % per-protocol cap is lent on Aave v3 (Base) / Earn equivalents
+   (the rest stays liquid); withdrawn first whenever BTC is bought back, and immediately on a severe protocol event.
+   A deterministic **protocol-status guard** reads the reserve's on-chain flags: no deposit into a frozen, paused or
+   inactive reserve, and money in a frozen reserve is withdrawn. Since 29 Oct 2026 every Aave v3 Base reserve is
+   frozen, so today the agent would hold the stable leg liquid (no yield) until it is unfrozen or another venue is
+   allowlisted by the owner. The backtests assumed yield on the whole stable leg; with the 60 % cap the true figure is
+   ≤ 60 % of that (a small effect: the stable leg is held ~25 % of the time).
 4. **Policy** checks every intent; **costs are known before acting** (order-book walk or on-chain quote + gas) and the
    expected edge (≈ 900 bps per round trip in the backtest) must exceed 2× the cost.
 
@@ -120,15 +125,38 @@ on the same ~4 cycles: it is data snooping until forward evidence accumulates. T
   favoured idea through.
 * **240 days** passes every gate (8.82×, bootstrap p = 0.001, equal or better in all five stress windows). It was
   checked *after* the 210 rejection, so it is selected evidence; it is used in the self-improvement test to exercise
-  the promotion path, and is **not** submitted to the paper agent. Whether to propose it is the owner's decision:
-  `btcagent propose --target cycle_guard.max_days_in_stable --value 240 --hypothesis "..."` - it would then still
-  need 4–12 weeks of shadow and 12 weeks of probation.
+  the promotion path. **Submitted to the paper agent on 2026-10-30** (the owner asked for the agent to be taken all the
+  way without approvals): `btcagent propose --target cycle_guard.max_days_in_stable --value 240 ...` → static ✓,
+  all five must-pass windows ✓, 8.82× vs 1.55×, bootstrap p = 0.001, deflated Sharpe 0.65 (t = 801 weeks) →
+  **shadow started**. The selection problem is handled by the forward process, not by the backtest: the champion holds
+  BTC now, so the challenger cannot act differently in shadow; it will run the full 12 weeks and, if promoted, be
+  flagged `offline_only_no_divergence_in_shadow`, and its probation keeps the old champion in shadow with automatic
+  rollback armed until the two have actually differed for 12 weeks — i.e. through the next bear market's re-entry
+  (SELF_IMPROVEMENT §2). The owner can withdraw it at any time: `btcagent withdraw --why "..."` cancels the
+  challenger in shadow (or, after a promotion, rolls back through the normal rollback path); it is logged and is not
+  counted as a rejection.
 * A second finding while testing: **the re-entry ladder never fires** in `cycle_guard_v2`. It requires the exit signal
   to be off, but the exit signal (≥2 weekly closes below the 50W) stays on for the whole time BTC is below the 50W,
   i.e. exactly when the ladder conditions (price ≤ 200W / realised price, MVRV ≤ 1) can hold. That is why V1 and V2
-  in §3 are identical. The validated results above are therefore results *without* a ladder. Making the ladder
-  reachable (e.g. "not a fresh exit this week" instead of "exit signal off") is a strategy change and must go through
-  the gates like any other proposal; it has not been tested yet.
+  in §3 are identical. The validated results above are therefore results *without* a ladder.
+  **Tested 2026-10-30** (`scripts/research_ladder.py`, `reports/ladder_study_v1.json`, four variants fixed before
+  running, judged by the frozen gate code with n_trials = 22). A reachable ladder is now an opt-in parameter,
+  `cycle_guard.ladder_after_exit` (default `false` = v2 behaviour, champion unchanged): the exit signal only opens the
+  stablecoin position; once out, the ladder may buy back in 25 % tranches while BTC is still below the 50W, and a
+  completed ladder re-entry disarms the exit until a fresh close above the 50W (otherwise it would sell again the
+  next week). Results:
+
+  | Variant | BTC multiple | per cycle 2012-16 / 2016-20 / 2020-24 / 2024-now | gate |
+  |---|---:|---|---|
+  | A champion | 1.55 | 1.54 / 0.74 / 1.29 / 1.05 | — |
+  | B reachable ladder | 3.69 | 1.41 / 1.23 / 1.74 / 1.22 | **fails** 2017–18 must-pass (1.85 vs 2.24); bootstrap p 0.16 |
+  | C 240 days | 8.82 | 2.11 / 1.41 / 2.14 / 1.39 | passes all; bootstrap p 0.001 |
+  | D ladder + 240 days | 4.20 | 1.41 / 1.23 / 1.74 / 1.39 | **fails** 2017–18 must-pass |
+
+  The ladder buys Nov–Dec 2018 at $5.6k→$3.5k: better over the whole cycle, but the stress window ends 2019-01-31 at
+  $3.4k, where still holding stables scores best. The frozen gate was not loosened. The ladder **hurts** when
+  combined with the 240-day re-entry (it re-enters earlier, near $350 in Oct 2014 vs ~$250 later): time-based
+  re-entry near the cycle-clock bottom is the stronger and better-supported rule. Decision: ladder stays off.
 * Risk if adopted: a time-based re-entry is a bet that bear markets keep their ~1-year length. If a bear market
   lasts much longer (as in 2014–15, which bottomed ~400 days after the 2013 top but chopped for another year), the
   re-entry happens too early and the 20 % stop does not help (it protects the other direction).

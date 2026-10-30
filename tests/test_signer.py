@@ -149,3 +149,37 @@ def test_signer_daemon_end_to_end(tmp_path, monkeypatch):
     assert r.status_code == 401                                   # no token, no service
     journal = (tmp_path / "signer.jsonl").read_text()
     assert "sign_ok" in journal and "sign_refused" in journal and "test-only-password" not in journal
+
+
+def test_rate_limit_never_blocks_exits_or_derisking(tmp_path, monkeypatch):
+    """Normal orders hit the hourly cap; withdrawals to self, approve-to-zero and (while killed) exits still sign,
+    against their own bounded ceiling."""
+    from btcagent.signer.server import EMERGENCY_SIGNATURES_PER_HOUR, Signer
+    monkeypatch.setenv("BTCAGENT_KEYSTORE_PASSWORD", "test-only-password")
+    ks = tmp_path / "k.json"
+    addr = keystore.create(ks)
+    sg = Signer(tmp_path / "st", str(ks), "fork")
+    n = [0]
+
+    def sign(to, data):
+        n[0] += 1
+        return sg.sign_tx({"chain": "base", "chain_id": 8453, "to": to, "data": data, "nonce": n[0], "gas": 300000,
+                           "max_fee_per_gas": 10**8, "max_priority_fee_per_gas": 10**6})
+
+    cap = LIMITS["rate"]["max_orders_per_hour"] * 4
+    for _ in range(cap):
+        assert sign(ROUTER, swap(recipient=addr))[0] == 200
+    code, body = sign(ROUTER, swap(recipient=addr))
+    assert code == 403 and "signer rate limit reached" in body["violations"]
+    withdraw = SEL_WITHDRAW + encode(["address", "uint256", "address"], [USDC, 10**6, addr]).hex()
+    assert sign(POOL, withdraw)[0] == 200                                     # de-risking: not blocked
+    revoke = SEL_APPROVE + encode(["address", "uint256"], [ROUTER, 0]).hex()
+    assert sign(USDC, revoke)[0] == 200                                       # approve-to-zero: not blocked
+    (tmp_path / "st" / "KILL").write_text("{}")
+    assert sign(ROUTER, swap(recipient=addr, tin=USDC, tout=CBBTC))[0] == 200  # kill exit: not blocked
+    code, body = sign(POOL, SEL_SUPPLY + encode(["address", "uint256", "address", "uint16"], [USDC, 1, addr, 0]).hex())
+    assert code == 403                                                        # killed: deposits still refused
+    for _ in range(EMERGENCY_SIGNATURES_PER_HOUR - 3):
+        assert sign(POOL, withdraw)[0] == 200
+    code, body = sign(POOL, withdraw)
+    assert code == 403 and "emergency ceiling" in body["violations"][0]       # but the emergency bucket is bounded

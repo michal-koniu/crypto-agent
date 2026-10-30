@@ -1,6 +1,6 @@
 # Soak test unit (paper, separate state): restarts on any exit so crash recovery can be exercised.
 [Unit]
-Description=btc-agent SOAK TEST (paper)
+Description=Crypto agent SOAK TEST (paper)
 After=network-online.target
 
 [Service]

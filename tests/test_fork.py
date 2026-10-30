@@ -36,6 +36,33 @@ def rpc(method, params):
     return r["result"]
 
 
+ACL_ABI = [
+    {"name": "ADDRESSES_PROVIDER", "type": "function", "stateMutability": "view", "inputs": [], "outputs": [{"name": "", "type": "address"}]},
+    {"name": "getACLAdmin", "type": "function", "stateMutability": "view", "inputs": [], "outputs": [{"name": "", "type": "address"}]},
+    {"name": "getACLManager", "type": "function", "stateMutability": "view", "inputs": [], "outputs": [{"name": "", "type": "address"}]},
+    {"name": "getPoolConfigurator", "type": "function", "stateMutability": "view", "inputs": [], "outputs": [{"name": "", "type": "address"}]},
+    {"name": "addPoolAdmin", "type": "function", "stateMutability": "nonpayable", "inputs": [{"name": "admin", "type": "address"}], "outputs": []},
+    {"name": "setReserveFreeze", "type": "function", "stateMutability": "nonpayable", "inputs": [{"name": "asset", "type": "address"}, {"name": "freeze", "type": "bool"}], "outputs": []},
+]
+
+
+def set_reserve_frozen(ex, asset: str, frozen_flag: bool):
+    """FORK-ONLY test setup: (un)freeze an Aave reserve by impersonating Aave's ACL admin on the local Anvil fork.
+    Since 29 Oct 2026 every Aave v3 Base reserve is frozen on mainnet; the deposit/withdraw/kill mechanics can only be
+    exercised on a fork after unfreezing. Never touches mainnet; the signer is not involved."""
+    w3 = ex.w3
+    pool = w3.eth.contract(ex.pool.address, abi=ACL_ABI)
+    prov = w3.eth.contract(pool.functions.ADDRESSES_PROVIDER().call(), abi=ACL_ABI)
+    admin, acl, conf = prov.functions.getACLAdmin().call(), prov.functions.getACLManager().call(), prov.functions.getPoolConfigurator().call()
+    rpc("anvil_impersonateAccount", [admin])
+    rpc("anvil_setBalance", [admin, hex(10**18)])
+    for to, data in ((acl, w3.eth.contract(acl, abi=ACL_ABI).encode_abi("addPoolAdmin", args=[admin])),
+                     (conf, w3.eth.contract(conf, abi=ACL_ABI).encode_abi("setReserveFreeze", args=[ex.tokens[asset]["address"], frozen_flag]))):
+        h = rpc("eth_sendTransaction", [{"from": admin, "to": to, "data": data}])
+        assert w3.eth.wait_for_transaction_receipt(h, timeout=60)["status"] == 1, (to, frozen_flag)
+    rpc("anvil_stopImpersonatingAccount", [admin])
+
+
 @pytest.fixture(scope="module")
 def env(tmp_path_factory):
     import os
@@ -64,8 +91,12 @@ def env(tmp_path_factory):
     w3.eth.wait_for_transaction_receipt(h, timeout=60)
     rpc("anvil_stopImpersonatingAccount", [a_token])
     from btcagent.execution.market import Market
+    from btcagent.risk.protocol_status import from_allowlists
     prices = Market().prices()
-    return {"dir": d, "addr": addr, "ex": ex, "ledger": led, "prices": prices, "signer": signer}
+    live = from_allowlists(RPC, frozen.allowlists(), w3=w3, ttl_seconds=0).status("aave_v3_base", "USDC")
+    if live["frozen"]:
+        set_reserve_frozen(ex, "USDC", False)        # mainnet state since 29 Oct 2026; see set_reserve_frozen
+    return {"dir": d, "addr": addr, "ex": ex, "ledger": led, "prices": prices, "signer": signer, "usdc_frozen_at_fork_block": live["frozen"]}
 
 
 def ctx(env, killed=False):
@@ -103,6 +134,29 @@ def test_aave_supply_and_withdraw(env):
     assert lent and lent[0].qty >= 49.99
     ex.lend(LendIntent(action="withdraw", venue="aave_v3_base", chain="base", asset="USDC", qty=lent[0].qty * 0.999))
     assert ex.erc20("USDC").functions.allowance(ex.me, ex.pool.address).call() == 0
+
+
+def test_protocol_guard_on_fork(env, tmp_path):
+    """The real Aave contracts: a frozen reserve gets no deposit, and money already in it is withdrawn by the guard."""
+    from btcagent.agent.core import Agent, ROOT
+    ex = env["ex"]
+    agent = Agent(ROOT / "config" / "agent.yaml", overrides={"mode": "fork", "state_dir": str(tmp_path), "alerts_dry_run": True,
+                                                             "analyst": {"enabled": False}, "news": {"enabled": False},
+                                                             "protocol_status": {"ttl_seconds": 0}})
+    agent.executor, agent.ledger = ex, env["ledger"]
+    agent.alerts.ledger = env["ledger"]
+    ex.lend(LendIntent(action="supply", venue="aave_v3_base", chain="base", asset="USDC", qty=60.0))
+    assert agent.protocol_guard(ex.portfolio(), env["prices"]) == []          # healthy (unfrozen on the fork)
+    set_reserve_frozen(ex, "USDC", True)                                       # the mainnet event, replayed on the fork
+    try:
+        out = agent.protocol_guard(ex.portfolio(), env["prices"])
+        assert out and out[0]["action"] == "withdrawn" and out[0]["why"] == "frozen", out
+        assert ex.atoken("USDC").functions.balanceOf(ex.me).call() < 10**4       # < 0.01 USDC left in Aave
+        skipped = agent._place_yield("USDC", env["prices"], datetime.now(timezone.utc), "fork-yield", "t")
+        assert skipped and skipped["lend_skipped"]["why"] == "frozen", skipped
+        env["ledger"].append("fork_evidence", {"protocol_guard": out, "usdc_frozen_at_fork_block": env["usdc_frozen_at_fork_block"]})
+    finally:
+        set_reserve_frozen(ex, "USDC", False)                                  # the kill drills below deposit first
 
 
 def _sign(env, to, data, declared_spend=None):

@@ -5,8 +5,11 @@ Phase 1  a deliberately weak champion (5 % BTC-terms stop) is replayed through 2
 Phase 2  a reflection is requested (human_request trigger); the LIVE reflector (3 samples, majority) writes at most
          one typed proposal; the gatekeeper runs static -> must-pass -> full-history backtest on it.
 Phase 3  the canonical fix (stable_stop_btc_pct 0.05 -> 0.20) is submitted as a proposal and must pass the same
-         gates; it runs in SHADOW next to the champion for >= 4 replayed weeks; promotion writes a new version;
-         later decisions show the new strategy version in use; the old champion runs in shadow for probation.
+         gates; it runs in SHADOW next to the champion; the shadow window (Apr-Jun 2023, champion fully in BTC) is a
+         state in which the change cannot act, so it must NOT be promoted at 4 weeks (identical weeks are not
+         evidence, course rule 1): it is promoted only at 12 weeks, flagged offline-evidence-only; promotion writes a
+         new version; later decisions show the new strategy version in use; the old champion runs in shadow for
+         probation (which waits for real divergence).
 Phase 4  rollback: a change that passed the gates but underperforms after promotion is simulated by installing a
          slow-re-entry champion (reclaim_weeks 6) into probation during the 2023 rally; Page-Hinkley / the 3 %
          limit must roll it back automatically.
@@ -129,7 +132,7 @@ agent.ledger.clock = lambda: now.isoformat()
 before_version = yaml.safe_load(sp.read_text())["champion"]
 res3 = agent.loop.propose_and_gate(now, feat.loc[:"2023-04-02"], panel.loc[:"2023-04-02"], {"human_request"}, forced=fix)
 log("phase 3 gate:", res3.get("result"), json.dumps({k: (res3.get("backtest") or res3.get("detail") or {}).get(k) for k in ("champion_multiple", "challenger_multiple", "bootstrap_p", "must_pass", "reasons")}, default=str))
-replay.run(agent, "2023-04-10", "2023-06-26", step_days=7, decide=True)
+replay.run(agent, "2023-04-10", "2023-08-07", step_days=7, decide=True)
 cfg3 = yaml.safe_load(sp.read_text())
 decisions = kinds(agent, "decision")
 bt3 = res3.get("backtest") or res3.get("detail") or {}
@@ -139,9 +142,14 @@ p3 = {"gate_result": res3.get("result"), "backtest": {k: bt3.get(k) for k in ("c
       "new_max_days_in_stable": cfg3["strategies"][cfg3["champion"]]["cycle_guard"]["max_days_in_stable"],
       "strategy_versions_in_decisions": sorted({d.get("strategy_version") for d in decisions if d.get("strategy_version")}),
       "probation_active": bool(agent.loop.ctrl.s.probation), "changes": [{k: c.get(k) for k in ("file", "version", "reason")} for c in kinds(agent, "change")]}
+promos = [g for g in agent.ledger.events(kind="gate_decision") if g.payload.get("result") == "promoted"]
+p3["promotion"] = {"at": promos[-1].ts if promos else None, "evidence": promos[-1].payload.get("evidence") if promos else None,
+                   "shadow_weeks": len([g for g in kinds(agent, "gate_decision") if g.get("result") == "shadow_started"]) and
+                   (int((pd.Timestamp(promos[-1].ts[:10]) - pd.Timestamp("2023-04-03")).days // 7) if promos else None)}
 p3["passed"] = res3.get("result") == "shadow_started" and p3["champion_after"] != before_version \
     and any(cfg3["champion"] in (v or "") for v in p3["strategy_versions_in_decisions"]) \
-    and cfg3["strategies"][cfg3["champion"]]["cycle_guard"]["max_days_in_stable"] == 240
+    and cfg3["strategies"][cfg3["champion"]]["cycle_guard"]["max_days_in_stable"] == 240 \
+    and p3["promotion"]["evidence"] == "offline_only_no_divergence_in_shadow" and (p3["promotion"]["shadow_weeks"] or 0) >= 12
 R["phases"]["3_fix_validated_promoted_in_use"] = p3
 log("phase 3", json.dumps(p3, default=str)[:1500])
 save()

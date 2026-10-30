@@ -132,6 +132,85 @@ def test_shadow_decisions():
     assert gatekeeper.shadow_decision(12, 1.0, 0.985).startswith("reject")
 
 
+def test_shadow_without_divergence_is_not_evidence():
+    # course rule 1: a challenger that never acted differently proved nothing -> no promotion at min_weeks
+    assert gatekeeper.shadow_decision(4, 1.0, 1.0, diverged=False) == "continue"
+    assert gatekeeper.shadow_decision(11, 1.0, 1.0, diverged=False) == "continue"
+    assert gatekeeper.shadow_decision(12, 1.0, 1.0, diverged=False) == "promote:offline_evidence_only"
+
+
+def test_probation_waits_for_real_divergence():
+    p = gatekeeper.probation_progress([0.0] * 12)
+    assert not p["done"] and p["dormant"] and p["divergent_weeks"] == 0
+    p = gatekeeper.probation_progress([0.0] * 30 + [0.001] * 11)
+    assert not p["done"] and p["dormant"]
+    p = gatekeeper.probation_progress([0.0] * 30 + [0.001] * 12)
+    assert p["done"] and p["divergent_weeks"] == 12
+
+
+def test_dormant_probation_reopens_judgment_only(tmp_path):
+    c = Controller(tmp_path / "c.json")
+    c.start_probation({"x": 1}, {"old_name": "a", "new_name": "b", "since": "2026-01-04"})
+    assert not c.may_reflect(NOW, {"scheduled_review"})[0]
+    c.s.probation["dormant"] = True
+    assert c.may_reflect(NOW, {"scheduled_review"})[0]
+
+
+def test_loop_identical_challenger_promoted_late_and_rollback_stays_armed(tmp_path, ledger):
+    """End to end through ImprovementLoop.weekly: a challenger identical to the champion is promoted only at
+    max_weeks, flagged offline-only; its probation goes dormant instead of passing; parameter proposals are refused
+    meanwhile; when the two finally diverge and the new one underperforms, the rollback still fires."""
+    import math
+    from btcagent.backtest.book import Book
+    from btcagent.improve.loop import ImprovementLoop
+    sp, pp = tmp_path / "strategies.yaml", tmp_path / "playbook.yaml"
+    shutil.copy(frozen.ROOT / "evolvable" / "strategies.yaml", sp)
+    shutil.copy(frozen.ROOT / "evolvable" / "playbook.yaml", pp)
+    loop = ImprovementLoop(tmp_path / "st", ledger, router=None, strategies_path=sp, playbook_path=pp, commit=False)
+    champ = gatekeeper.champion_params(loop.cfg())
+    chall = copy.deepcopy(champ)
+    chall["cycle_guard"]["max_days_in_stable"] = 240
+    loop.shadows.books["rules_champion"] = Book(params=champ)
+    loop.shadows.books["challenger"] = Book(params=chall)
+    loop.shadows.meta["challenger_start"] = "2027-01-03"
+    loop.ctrl.start({"id": "p1", "kind": "params", "params": chall, "weeks": 0,
+                     "proposal": {"op": "PARAM_CHANGE", "target": "cycle_guard.max_days_in_stable", "new_value": 240}})
+    day = datetime(2027, 1, 3, tzinfo=timezone.utc)
+
+    def week(a, b):
+        nonlocal day
+        day += timedelta(days=7)
+        for name, v in ((("rules_champion", a), ("challenger", b)) if "challenger" in loop.shadows.books
+                        else (("rules_champion", a), ("old_champion", b))):
+            loop.shadows.nav_hist.setdefault(name, []).append([str(day.date()), v])
+        return loop.weekly(day)
+
+    outs = [week(1.0, 1.0) for _ in range(12)]
+    assert [o["shadow"] for o in outs[:11]] == ["continue"] * 11
+    assert outs[11]["shadow"] == "promote:offline_evidence_only"
+    promo = [e.payload for e in ledger.events(kind="gate_decision") if e.payload.get("result") == "promoted"]
+    assert promo and promo[-1]["evidence"] == "offline_only_no_divergence_in_shadow"
+    assert loop.ctrl.s.probation and "old_champion" in loop.shadows.books
+    # 13 identical weeks of probation: dormant, not passed; the old champion stays in shadow
+    for _ in range(13):
+        out = week(1.0, 1.0)            # (new = rules_champion, old = old_champion)
+    assert out["probation"]["dormant"] and not out["probation"]["done"]
+    assert loop.ctrl.s.probation.get("dormant") and "old_champion" in loop.shadows.books
+    assert loop.ctrl.may_reflect(day, {"scheduled_review"})[0]          # judgment changes may proceed
+    prop = P(op="PARAM_CHANGE", target="cycle_guard.exit_weeks_below_50w", new_value=3)
+    r = loop.propose_and_gate(day, None, None, {"scheduled_review"}, forced=prop)
+    assert r["result"] == "reject:static" and "rollback watch" in r["detail"]["violations"][0]
+    # the rare state arrives and the new champion falls behind the old one: rollback fires
+    nav_new, nav_old = 1.0, 1.0
+    for _ in range(8):
+        nav_new *= math.exp(-0.01)
+        out = week(nav_new, nav_old)
+        if not loop.ctrl.s.probation:
+            break
+    assert out["probation"]["rollback"]
+    assert ledger.events(kind="rollback")
+
+
 def test_course_statistics_match_published_tables():
     assert round(stats.mcnemar_p(3, 11), 3) == 0.029
     assert round(stats.mcnemar_p(20, 23), 2) == 0.38
@@ -147,3 +226,36 @@ def test_deflated_sharpe_penalises_many_trials():
     r = np.random.default_rng(1).normal(0.002, 0.02, 520)
     one, many = stats.deflated_sharpe(r, 1), stats.deflated_sharpe(r, 1000)
     assert many["dsr"] < one["dsr"]
+
+
+def test_boolean_params_parse_strictly():
+    assert gatekeeper.as_bool("false") is False and gatekeeper.as_bool("True") is True and gatekeeper.as_bool(1) is True
+    with pytest.raises(ValueError):
+        gatekeeper.as_bool("maybe")
+    champ = gatekeeper.champion_params(cfg())
+    got = gatekeeper.apply_proposal_to_params(champ, P(op="PARAM_CHANGE", target="cycle_guard.ladder_after_exit", new_value="false"))
+    assert got["cycle_guard"]["ladder_after_exit"] is False            # bool("false") would have been True
+    assert "no change from the current value" in gatekeeper.static_gate(
+        P(op="PARAM_CHANGE", target="cycle_guard.ladder_after_exit", new_value="false"), cfg())
+    assert gatekeeper.static_gate(P(op="PARAM_CHANGE", target="cycle_guard.ladder_after_exit", new_value=True), cfg()) == []
+    assert "not a boolean" in gatekeeper.static_gate(
+        P(op="PARAM_CHANGE", target="cycle_guard.ladder_after_exit", new_value="sometimes"), cfg())[0]
+
+
+def test_human_withdraw_cancels_shadow_without_counting_a_rejection(tmp_path, ledger):
+    from btcagent.backtest.book import Book
+    from btcagent.improve.loop import ImprovementLoop
+    sp, pp = tmp_path / "strategies.yaml", tmp_path / "playbook.yaml"
+    shutil.copy(frozen.ROOT / "evolvable" / "strategies.yaml", sp)
+    shutil.copy(frozen.ROOT / "evolvable" / "playbook.yaml", pp)
+    loop = ImprovementLoop(tmp_path / "st", ledger, router=None, strategies_path=sp, playbook_path=pp, commit=False)
+    champ = gatekeeper.champion_params(loop.cfg())
+    loop.shadows.books["challenger"] = Book(params=champ)
+    loop.ctrl.start({"id": "p9", "kind": "params", "params": champ, "weeks": 3,
+                     "proposal": {"op": "PARAM_CHANGE", "target": "cycle_guard.max_days_in_stable", "new_value": 240}})
+    before = loop.ctrl.s.rejections_in_row
+    assert loop.withdraw(NOW, "owner changed his mind")["result"] == "withdrawn_challenger"
+    assert loop.ctrl.s.in_flight is None and "challenger" not in loop.shadows.books
+    assert loop.ctrl.s.rejections_in_row == before
+    assert [e.payload["result"] for e in ledger.events(kind="gate_decision")] == ["withdrawn_by_human"]
+    assert loop.withdraw(NOW, "again")["result"] == "nothing_to_withdraw"

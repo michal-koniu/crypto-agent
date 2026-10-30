@@ -2,7 +2,7 @@
 # The keystore password comes from the Bitwarden vault at start-up (bw-secret, see llm-private-education ch. 11);
 # it is never written to disk or to this file. CEX keys (trade-only, no withdrawal permission) likewise.
 [Unit]
-Description=btc-agent signer (holds keys, signs only what its own policy allows)
+Description=Crypto agent signer (holds keys, signs only what its own policy allows)
 After=network-online.target
 
 [Service]

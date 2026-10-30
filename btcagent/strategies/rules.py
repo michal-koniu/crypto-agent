@@ -61,7 +61,11 @@ def cycle_guard(f: dict, st: StrategyState, p: dict) -> tuple[float, dict]:
     trim = (_ok(f.get("risk")) and f["risk"] >= p["trim_risk"]) or \
            (_ok(f.get("logreg_resid_pct")) and f["logreg_resid_pct"] >= p["trim_resid_pct"])
     rules["valuation_trim"] = bool(trim)
-    if exit_sig:
+    # ladder_after_exit (default off = v2 behaviour): the exit signal only opens the stablecoin position (fresh exit);
+    # once out, the re-entry ladder may scale back in while BTC is still below the 50W. In v2 the ladder required the
+    # exit signal to be off, which never happens while BTC is below the 50W - the ladder could not fire (STRATEGY §7).
+    ladder_free = bool(p.get("ladder_after_exit", False))
+    if exit_sig and (not ladder_free or st.stable == 0):
         s = max(s, p["exit_fraction"])
     elif trim:
         s = max(s, p["trim_fraction"])
@@ -78,8 +82,9 @@ def cycle_guard(f: dict, st: StrategyState, p: dict) -> tuple[float, dict]:
         rules["reentry_conditions"] = {k: bool(v) for k, v in conds.items()}
         blocked = f.get("midterm_h1") == 1 and not (conds["cheap_vs_trend"] and conds["onchain_reset"])
         rules["midterm_h1_block"] = bool(blocked) and n >= p["reentry_k"]
-        if n >= p["reentry_k"] and not blocked and not exit_sig:
+        if n >= p["reentry_k"] and not blocked and (ladder_free or not exit_sig):
             s = max(0.0, s - p["reentry_tranche"])
+            rules["ladder_tranche"] = True
         reclaim = _ok(f.get("weeks_above_50w")) and f["weeks_above_50w"] >= p["reclaim_weeks"]
         timed_out = st.weeks_in_stable * 7 >= p["max_days_in_stable"]
         stop_hit = st.stable_entry_btc_price and price >= st.stable_entry_btc_price / (1 - p["stable_stop_btc_pct"])
@@ -153,6 +158,8 @@ def advance_state(st: StrategyState, t: Target, f: dict) -> StrategyState:
         new.eth_entry_ethbtc, new.eth_weeks_below = None, 0
     if st.stable > 0 and t.stable < st.stable and (t.rules.get("stable_stop") or t.rules.get("max_time_out")):
         new.exit_armed = False
+    if st.stable > 0 and t.stable == 0 and t.rules.get("ladder_tranche"):
+        new.exit_armed = False       # a completed ladder re-entry: a new exit needs a fresh close above the 50W
     if _ok(f.get("weeks_above_50w")) and f["weeks_above_50w"] >= 1:
         new.exit_armed = True
     new.stable, new.eth = t.stable, t.eth

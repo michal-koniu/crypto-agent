@@ -3,7 +3,7 @@
 #           systemctl --user daemon-reload && systemctl --user enable --now btcagent
 #           loginctl enable-linger $USER     # keep user services running without a login session
 [Unit]
-Description=btc-agent (BTC-denominated portfolio agent)
+Description=Crypto agent (btc-agent: portfolio measured in BTC, paper unless enabled)
 After=network-online.target llama-swap.service
 Wants=network-online.target
 

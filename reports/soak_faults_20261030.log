@@ -1,0 +1,10 @@
+2026-10-29T18:52:26Z schedule start
+2026-10-29T18:52:52Z manual restart to load current limits (max_order_nav_fraction 1.0)
+2026-10-29T18:54:43Z manual restart to load the realised-drawdown policy
+2026-10-29T20:22:26Z FAULT exchange_down for 20 min
+2026-10-29T20:47:26Z FAULT llm_down rig for 70 min
+2026-10-29T22:17:26Z FAULT kill -9 pid 305749
+2026-10-29T22:19:26Z after crash: active=active pid=455286 restarts=1
+2026-10-29T23:49:26Z FAULT graceful stop (simulated reboot)
+2026-10-29T23:50:26Z restarted: active=active
+2026-10-29T23:50:26Z schedule done

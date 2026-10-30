@@ -30,6 +30,7 @@ strategies:
       reclaim_weeks: 2
       max_days_in_stable: 450
       stable_stop_btc_pct: 0.20
+      ladder_after_exit: false   # v2 behaviour: the ladder cannot fire below the 50W (STRATEGY §7); true = reachable ladder
     alt_gate:
       enabled: false
       eth_weight: 0.15

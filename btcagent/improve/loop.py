@@ -209,6 +209,9 @@ class ImprovementLoop:
             return self._reject(now, prop, "reject:static", {"violations": v})
         if prop.op in ("PLAYBOOK_ADD", "PLAYBOOK_MODIFY", "PLAYBOOK_RETIRE"):
             return self._playbook_change(now, prop, pe.id)
+        if self.ctrl.s.probation:
+            return self._reject(now, prop, "reject:static", {"violations": [
+                "strategy changes are blocked while the last promotion's rollback watch is armed (dormant probation)"]})
         champ = gatekeeper.champion_params(cfg)
         chall = gatekeeper.apply_proposal_to_params(champ, prop)
         n_trials = len(self.ledger.events(kind="gate_decision")) + 10      # + the 10 pre-registered variants
@@ -267,9 +270,11 @@ class ImprovementLoop:
         fl = self.ctrl.s.in_flight
         if fl and fl.get("kind") == "params":
             fl["weeks"] = fl.get("weeks", 0) + 1
-            d = gatekeeper.shadow_decision(fl["weeks"], self.shadows.nav("rules_champion") or 1, self.shadows.nav("challenger") or 1)
+            diverged = self.diverged("rules_champion", "challenger", self.shadows.meta.get("challenger_start", ""))
+            d = gatekeeper.shadow_decision(fl["weeks"], self.shadows.nav("rules_champion") or 1, self.shadows.nav("challenger") or 1,
+                                           diverged=diverged)
             out["shadow"] = d
-            if d == "promote":
+            if d.startswith("promote"):
                 cfg = self.cfg()
                 old = copy.deepcopy(cfg["strategies"][cfg["champion"]])
                 new_name = f"{cfg['champion'].rsplit('_v', 1)[0]}_v{int(cfg.get('version', 1)) + 1}"
@@ -288,7 +293,8 @@ class ImprovementLoop:
                 self.ctrl.start_probation(old, {"old_name": prev_name, "new_name": new_name, "since": str(now.date())})
                 self.ctrl.decided(now, accepted=True)
                 self.ledger.append("gate_decision", {"proposal_id": fl["id"], "op": fl["proposal"]["op"], "target": fl["proposal"]["target"],
-                                                     "new_value": fl["proposal"]["new_value"], "result": "promoted", "version": ver})
+                                                     "new_value": fl["proposal"]["new_value"], "result": "promoted", "version": ver,
+                                                     "evidence": "full" if d == "promote" else "offline_only_no_divergence_in_shadow"})
             elif d.startswith("reject"):
                 self.shadows.drop("challenger")
                 self.ledger.append("gate_decision", {"proposal_id": fl["id"], "op": fl["proposal"]["op"], "target": fl["proposal"]["target"],
@@ -299,17 +305,49 @@ class ImprovementLoop:
             diffs = self.shadows.weekly_log_diffs("rules_champion", "old_champion", pr["since"])
             pr["weekly_diffs"] = diffs
             rollback, why = gatekeeper.probation_check(diffs)
-            weeks = len(diffs)
-            out["probation"] = {"weeks": weeks, "rollback": rollback, "why": why}
+            prog = gatekeeper.probation_progress(diffs)
+            out["probation"] = {**prog, "rollback": rollback, "why": why}
             if rollback:
                 self.rollback(now, why)
-            elif weeks >= frozen.gate_rules()["probation"]["weeks"]:
+            elif prog["done"]:
                 self.shadows.drop("old_champion")
                 self.ctrl.end_probation(rolled_back=False)
-                self.ledger.append("probation", {"result": "passed", "weeks": weeks})
+                self.ledger.append("probation", {"result": "passed", "weeks": prog["weeks"], "divergent_weeks": prog["divergent_weeks"]})
+            elif prog["dormant"] and not pr.get("dormant"):
+                pr["dormant"] = True
+                self.ledger.append("probation", {"result": "dormant", "weeks": prog["weeks"], "divergent_weeks": prog["divergent_weeks"],
+                                                 "note": "rollback watch stays armed; only playbook/judgment changes may proceed"})
         self.ctrl.save()
         self.shadows.save()
         return out
+
+    def withdraw(self, now: datetime, why: str) -> dict:
+        """Human only (CLI): cancel the challenger in shadow, or undo a promotion still on probation (via the normal
+        rollback). Not counted as a rejection: no backoff, no step towards MAINTENANCE."""
+        fl = self.ctrl.s.in_flight
+        if fl:
+            self.shadows.drop("challenger")
+            p = fl.get("proposal", {})
+            self.ledger.append("gate_decision", {"proposal_id": fl.get("id"), "op": p.get("op"), "target": p.get("target"),
+                                                 "new_value": p.get("new_value"), "result": "withdrawn_by_human", "why": why})
+            self.ctrl.s.in_flight = None
+            self.ctrl._note(f"withdrawn by human: {why}")
+            out = {"result": "withdrawn_challenger", "target": p.get("target")}
+        elif self.ctrl.s.probation:
+            self.rollback(now, f"withdrawn by human: {why}")
+            out = {"result": "rolled_back_promotion"}
+        else:
+            out = {"result": "nothing_to_withdraw"}
+        self.ctrl.save()
+        self.shadows.save()
+        return out
+
+    def diverged(self, a: str, b: str, since: str) -> bool:
+        """True if books a and b had different virtual NAVs at some common week since `since`."""
+        eps = frozen.gate_rules()["shadow"]["divergence_epsilon"]
+        ha = {d: v for d, v in self.shadows.nav_hist.get(a, []) if d >= since}
+        return any(d in ha and ha[d] > 0 and v > 0 and abs(math.log(v / ha[d])) > eps
+                   for d, v in self.shadows.nav_hist.get(b, []) if d >= since)
 
     def rollback(self, now: datetime, why: str):
         cfg = self.cfg()

@@ -69,6 +69,7 @@ class Agent:
                                     commit=self.cfg.get("git_commit_changes", True))
         self._panel = None
         self._feat = None
+        self.protocol_status = None
 
     # ------------------------------------------------------------------ state files
     def _sf(self, name: str) -> Path:
@@ -181,6 +182,88 @@ class Agent:
                 d = check(li, self.context(self.executor.portfolio(), prices, self.clock()))
                 if d.allowed:
                     out.append(self.executor.lend(li))
+        return out
+
+    # ------------------------------------------------------------------ protocol-status guard (deterministic)
+    def _protocols(self):
+        """Reserve-flag reader (risk/protocol_status.py). Fork/live use the executor's own chain connection; paper mode
+        reads the real chain through a read-only RPC so paper mirrors the real protocol state; replays never read today's
+        chain (it would be look-ahead)."""
+        pc = self.cfg.get("protocol_status", {})
+        if self.mode == "replay" or not pc.get("enabled", True):
+            return None
+        if self.protocol_status is None:
+            from ..risk import protocol_status
+            self.protocol_status = protocol_status.from_allowlists(pc.get("rpc_url", "https://mainnet.base.org"), frozen.allowlists(),
+                                                                   w3=getattr(self.executor, "w3", None),
+                                                                   ttl_seconds=pc.get("ttl_seconds", 300))
+        return self.protocol_status
+
+    def _reserve_status(self, protocol: str, asset: str) -> dict | None:
+        ps = self._protocols()
+        if ps is None:
+            return None
+        st = ps.status(protocol, asset)
+        seen = self._load("protocol_status.json", {})
+        key = f"{protocol}:{asset}"
+        flags = {k: st.get(k) for k in ("active", "frozen", "paused", "error")}
+        if seen.get(key) != flags:          # log and alert on every change of state, not on every read
+            seen[key] = flags
+            self._save("protocol_status.json", seen)
+            self.ledger.append("protocol_status", st)
+            if st.get("paused"):
+                self.alerts.send("protocol", "critical", f"{protocol} {asset} reserve PAUSED", "withdrawals impossible until unpaused")
+            elif st.get("frozen") or st.get("active") is False:
+                self.alerts.send("protocol", "warning", f"{protocol} {asset} reserve frozen/inactive",
+                                 "no new deposits; funds in it are withdrawn by the protocol guard")
+        return st
+
+    def _place_yield(self, stable: str, prices: Prices, now: datetime, did: str, version: str) -> dict | None:
+        """Lend idle stables (only while the rules hold stables and no protocol risk was flagged)."""
+        y = self.cfg["yield"]
+        pf3 = self.executor.portfolio()
+        liquid = pf3.qty(stable, liquid_only=True) * (1 - y["keep_liquid_fraction"])
+        # never above the frozen per-protocol cap (and the allowlist's own cap): lend up to it, keep the rest liquid.
+        # Before this, the step tried to lend 100 % of the stables, which the policy engine always refused when the
+        # portfolio was fully in stables - no yield at all in the stable phase (found in the final review).
+        allow_cap = frozen.allowlists().get("protocols", {}).get(y["protocol"], {}).get("max_weight", 1.0)
+        cap = min(frozen.limits()["position"]["max_protocol_weight"], allow_cap)
+        nav_btc = pf3.nav_btc(prices)
+        room_btc = max(0.0, cap * nav_btc - pf3.protocol_weights(prices).get(y["protocol"], 0.0) * nav_btc)
+        liquid = min(liquid, room_btc / prices.btc(stable) * 0.999 if prices.btc(stable) else 0.0)
+        if liquid * prices.usd[stable] < y["min_usd"]:
+            return None
+        st = self._reserve_status(y["protocol"], stable)
+        if st is not None and not st.get("suppliable"):
+            return {"lend_skipped": {"protocol": y["protocol"], "asset": stable,
+                                     "why": st.get("error") or ("frozen" if st.get("frozen") else "paused" if st.get("paused") else "inactive")}}
+        from ..types import CostEstimate
+        li = LendIntent(action="supply", venue=y["protocol"], chain="base", asset=stable, qty=liquid, expected_apy=y["expected_apy"],
+                        cost=CostEstimate(gas_usd=0.05, lockup_hours=y["lockup_hours"], source="config"), strategy_id=self._champion_name(),
+                        strategy_version=version, decision_id=did)
+        d = check(li, self.context(pf3, prices, now))
+        self.ledger.append("policy_check", {"decision_id": did, "intent": li.model_dump(mode="json"), "allowed": d.allowed, "violations": d.violations})
+        return {"lend": self.executor.lend(li)} if d.allowed else None
+
+    def protocol_guard(self, pf: Portfolio, prices: Prices) -> list:
+        """Every risk tick: money in a frozen or inactive reserve is withdrawn; a paused reserve raises a critical alert."""
+        out, done = [], set()
+        for h in pf.holdings:
+            if not h.protocol or h.qty <= 0 or (h.protocol, h.asset) in done:
+                continue
+            st = self._reserve_status(h.protocol, h.asset)
+            if st is None or st.get("error"):
+                continue
+            done.add((h.protocol, h.asset))
+            if st.get("paused"):
+                out.append({"protocol": h.protocol, "asset": h.asset, "action": "cannot_withdraw_paused"})
+            elif st.get("frozen") or st.get("active") is False:
+                did = f"protocol-{uuid.uuid4()}"
+                res = self._withdraw_all(h.asset, prices, did, {h.protocol})
+                rec = {"protocol": h.protocol, "asset": h.asset, "qty": h.qty, "why": "frozen" if st.get("frozen") else "inactive",
+                       "decision_id": did, "withdrawals": len(res)}
+                self.ledger.append("protocol_exit", rec)
+                out.append({**rec, "action": "withdrawn"})
         return out
 
     def _champion_name(self) -> str:
@@ -302,20 +385,12 @@ class Agent:
                 qty = pf2.qty(stable, liquid_only=True) if final_s == 0 else (cur_s - final_s) * nav_btc * prices.usd["BTC"]
                 if qty > 0:
                     actions.append(self._trade(stable, "BTC", min(qty, pf2.qty(stable, liquid_only=True)), prices, now, did, "strategy", None, params, version))
-        # idle stables earn yield (only when the rules want to hold stables and the analyst flagged no protocol risk)
-        y = self.cfg["yield"]
-        if y["enabled"] and not protocol_exit and final_s > 0:
-            pf3 = self.executor.portfolio()
-            liquid = pf3.qty(stable, liquid_only=True) * (1 - y["keep_liquid_fraction"])
-            if liquid * prices.usd[stable] >= y["min_usd"]:
-                from ..types import CostEstimate
-                li = LendIntent(action="supply", venue=y["protocol"], chain="base", asset=stable, qty=liquid, expected_apy=y["expected_apy"],
-                                cost=CostEstimate(gas_usd=0.05, lockup_hours=y["lockup_hours"], source="config"), strategy_id=self._champion_name(),
-                                strategy_version=version, decision_id=did)
-                d = check(li, self.context(pf3, prices, now))
-                self.ledger.append("policy_check", {"decision_id": did, "intent": li.model_dump(mode="json"), "allowed": d.allowed, "violations": d.violations})
-                if d.allowed:
-                    actions.append({"lend": self.executor.lend(li)})
+        # idle stables earn yield (only when the rules want to hold stables, the analyst flagged no protocol risk and the
+        # reserve itself accepts deposits - protocol-status guard)
+        if self.cfg["yield"]["enabled"] and not protocol_exit and final_s > 0:
+            a = self._place_yield(stable, prices, now, did, version)
+            if a:
+                actions.append(a)
         pf_after = self.executor.portfolio()
         rec = {"decision_id": did, "mode": self.mode, "as_of": now.isoformat(), "week": week, "new_week": new_week,
                "strategy_version": version, "playbook_version": pb.version, "prompt_version": prompts.PROMPT_VERSION,
@@ -489,6 +564,9 @@ class Agent:
                     sst["target"]["stable"] = 0.0
                     self._save("strategy_state.json", sst)
                 out.setdefault("stops", []).append(asset)
+        guard = self.protocol_guard(self.executor.portfolio(), prices)
+        if guard:
+            out["protocol_guard"] = guard
         if killswitch.is_killed(self.state) and not self._load("kill_done.json", {}).get("done"):
             out["kill_procedure"] = self.kill_procedure(prices, now)
         return out

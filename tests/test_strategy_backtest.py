@@ -73,3 +73,31 @@ def test_emergency_plan_shapes():
     assert {(s["sell"], s["buy"]) for s in plan if s["step"] == "convert"} == {("USDC", "BTC"), ("ETH", "BTC")}
     assert [s["step"] for s in emergency_plan(holdings, "halt_only")] == ["cancel_open_orders", "revoke_approvals"]
     assert emergency_plan(holdings, "to_safe_address")[-1]["step"] == "transfer_all_to_safe"
+
+
+def _bear_week(price, days_since_ath, below=True):
+    return {"btc": price, "days_since_halving": 700, "weeks_below_50w": 5 if below else 0,
+            "weeks_above_50w": 0 if below else 3, "days_since_ath": days_since_ath, "sma200w": 30000.0,
+            "price_to_realized": 0.9, "mvrv": 0.9, "risk": 0.1, "midterm_h1": 0}
+
+
+def test_ladder_unreachable_by_default_and_reachable_when_enabled():
+    from btcagent.strategies.rules import advance_state
+    p = gatekeeper.champion_params(gatekeeper.load_strategies())
+    assert p["cycle_guard"]["ladder_after_exit"] is False              # champion = v2 behaviour
+    for ladder, expect in ((False, [1.0, 1.0, 1.0, 1.0, 1.0]), (True, [1.0, 0.75, 0.5, 0.25, 0.0])):
+        p["cycle_guard"]["ladder_after_exit"] = ladder
+        st, seen = StrategyState(), []
+        for w in range(5):                    # deep bear: every bottom condition holds, BTC stays below the 50W
+            f = _bear_week(25000.0, 400 + 7 * w)
+            t = target(f, st, p)
+            seen.append(t.stable)
+            st = advance_state(st, t, f)
+        assert seen == expect, (ladder, seen)
+        if ladder:
+            # completed ladder re-entry disarms the exit: still below the 50W next week, but no new sell-off
+            assert st.exit_armed is False
+            assert target(_bear_week(25000.0, 450), st, p).stable == 0.0
+            # a fresh weekly close above the 50W re-arms it
+            st = advance_state(st, target(_bear_week(40000.0, 460, below=False), st, p), _bear_week(40000.0, 460, below=False))
+            assert st.exit_armed is True
