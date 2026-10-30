@@ -2,7 +2,7 @@
 
 `frozen/frozen.lock` holds the SHA-256 of every frozen file *and* of the source files of the modules that enforce
 them (policy engine, signer, ledger, metrics, gatekeeper). The core verifies the lock at start-up and before every
-cycle; a mismatch halts the agent. Only the human re-locks (`btcagent frozen lock`), normally after reviewing a diff.
+cycle; a mismatch halts the agent. Only the human re-locks (`cryptoagent frozen lock`), normally after reviewing a diff.
 
 This is the course's "freeze the measurement layer by construction" (03 §2): the LLM has no tool that writes files,
 the gatekeeper only writes to `evolvable/`, and even a code path that wrote here would be caught by the lock.
@@ -28,18 +28,18 @@ FROZEN_FILES = [
     "frozen/gate_rules.yaml",
     "frozen/param_bounds.yaml",
     "frozen/sentinel.yaml",
-    "btcagent/frozen.py",
-    "btcagent/types.py",
-    "btcagent/policy/engine.py",
-    "btcagent/signer/policy.py",
-    "btcagent/signer/server.py",
-    "btcagent/signer/keystore.py",
-    "btcagent/ledger/store.py",
-    "btcagent/ledger/tax.py",
-    "btcagent/backtest/metrics.py",
-    "btcagent/improve/gatekeeper.py",
-    "btcagent/improve/stats.py",
-    "btcagent/risk/killswitch.py",
+    "cryptoagent/frozen.py",
+    "cryptoagent/types.py",
+    "cryptoagent/policy/engine.py",
+    "cryptoagent/signer/policy.py",
+    "cryptoagent/signer/server.py",
+    "cryptoagent/signer/keystore.py",
+    "cryptoagent/ledger/store.py",
+    "cryptoagent/ledger/tax.py",
+    "cryptoagent/backtest/metrics.py",
+    "cryptoagent/improve/gatekeeper.py",
+    "cryptoagent/improve/stats.py",
+    "cryptoagent/risk/killswitch.py",
 ]
 
 # The only files the gatekeeper may write (after gates pass). Everything else is out of the agent's reach.

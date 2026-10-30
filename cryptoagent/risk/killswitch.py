@@ -1,8 +1,8 @@
 """Kill switch and halt (FROZEN).
 
-* KILL: engaged manually (`btcagent kill`, or `touch <state>/KILL`) or automatically (drawdown limits, repeated
+* KILL: engaged manually (`cryptoagent kill`, or `touch <state>/KILL`) or automatically (drawdown limits, repeated
   execution failures, frozen-layer tampering). While engaged, the policy engine and the signer allow only the
-  emergency procedure. Only the human can release it (`btcagent kill --release`); no code path in the agent does.
+  emergency procedure. Only the human can release it (`cryptoagent kill --release`); no code path in the agent does.
 * HALT: engaged automatically for the rest of the UTC day on the daily-loss limit; new risk is blocked, exits to BTC
   are allowed. Cleared automatically at the next UTC day.
 

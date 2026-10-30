@@ -34,7 +34,7 @@ other. TTL 600 s: models unload after 10 minutes idle, so the agent holds the GP
 ## Endpoints used
 | What | Where |
 |---|---|
-| LLMs | `http://localhost:8080/v1` (override with `BTCAGENT_RIG_URL`) |
-| Signer | `127.0.0.1:8790` (token in `~/.local/state/btcagent/signer.token`, mode 600) |
-| Anvil fork | `127.0.0.1:8545` (Docker `btcagent-anvil`) |
+| LLMs | `http://localhost:8080/v1` (override with `CRYPTOAGENT_RIG_URL`) |
+| Signer | `127.0.0.1:8790` (token in `~/.local/state/cryptoagent/signer.token`, mode 600) |
+| Anvil fork | `127.0.0.1:8545` (Docker `cryptoagent-anvil`) |
 | Alerts | `msmtp` (already configured on the rig for Netdata) |

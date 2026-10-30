@@ -16,7 +16,7 @@ from .. import frozen
 from ..types import (ApproveIntent, Intent, LendIntent, PolicyDecision, Portfolio, Prices, TradeIntent,
                      TransferIntent)
 
-LIVE_ENV = "BTCAGENT_LIVE"
+LIVE_ENV = "CRYPTOAGENT_LIVE"
 LIVE_VALUE = "I_ACCEPT_REAL_LOSSES"
 EXIT_REASONS = {"stop_loss", "kill_switch"}
 

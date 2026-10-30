@@ -3,9 +3,9 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from btcagent import frozen
-from btcagent.policy.engine import LIVE_ENV, LIVE_VALUE, check
-from btcagent.types import ApproveIntent, CostEstimate, LendIntent, StopRule, TradeIntent, TransferIntent
+from cryptoagent import frozen
+from cryptoagent.policy.engine import LIVE_ENV, LIVE_VALUE, check
+from cryptoagent.types import ApproveIntent, CostEstimate, LendIntent, StopRule, TradeIntent, TransferIntent
 from conftest import cheap_cost, pf
 
 ROUTER = "0x2626664c2603336E57B271c5C0b26F421741e481"

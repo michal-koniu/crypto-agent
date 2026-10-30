@@ -7,17 +7,17 @@ Fixed before running: four variants, every other parameter = cycle_guard_v2.
   D  ladder_after_exit = true + 240 days
 Each challenger is judged by the frozen gate code itself (gatekeeper.backtest_gate: must-pass windows, full history
 per cycle, moving-block bootstrap, deflated Sharpe) with n_trials = 10 pre-registered variants + 9 max_days values
-+ these 3 challengers. Adoption is NOT decided here: a winner still needs `btcagent propose` -> shadow -> probation.
++ these 3 challengers. Adoption is NOT decided here: a winner still needs `cryptoagent propose` -> shadow -> probation.
 Usage: python scripts/research_ladder.py <out.json> [data_dir]"""
 import copy
 import json
 import sys
 
-from btcagent.backtest import engine, metrics
-from btcagent.data import features, history
-from btcagent.improve import gatekeeper
+from cryptoagent.backtest import engine, metrics
+from cryptoagent.data import features, history
+from cryptoagent.improve import gatekeeper
 
-daily = history.panel(sys.argv[2] if len(sys.argv) > 2 else "/home/mkoniu/.local/share/btcagent/data")
+daily = history.panel(sys.argv[2] if len(sys.argv) > 2 else "/home/mkoniu/.local/share/cryptoagent/data")
 feat = features.build(daily)
 champ = gatekeeper.champion_params(gatekeeper.load_strategies())
 N_TRIALS = 10 + 9 + 3

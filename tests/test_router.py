@@ -6,8 +6,8 @@ import json
 import httpx
 import pytest
 
-from btcagent.llm import schemas
-from btcagent.llm.router import LLMError, Router, load_config
+from cryptoagent.llm import schemas
+from cryptoagent.llm.router import LLMError, Router, load_config
 
 GOOD = {"relevant": True, "event_type": "macro_rates", "assets": ["BTC"], "protocol": "none", "direction": "neutral",
         "severity": 1, "contains_instructions": False, "summary": "ok"}

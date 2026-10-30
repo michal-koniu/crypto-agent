@@ -1,8 +1,8 @@
 # SOAK TEST config: decide every 60 min, 1 analyst sample, alerts to the ledger only, separate state dir.
 mode: paper
 executor: paper
-state_dir: ~/.local/state/btcagent-soak
-data_dir: ~/.local/share/btcagent/data
+state_dir: ~/.local/state/cryptoagent-soak
+data_dir: ~/.local/share/cryptoagent/data
 models: config/models.yaml
 strategies: evolvable/strategies.yaml
 playbook: evolvable/playbook.yaml

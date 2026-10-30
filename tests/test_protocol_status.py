@@ -2,10 +2,10 @@
 
 Fixtures are the real Aave v3 Base USDC reserve configurations read from mainnet on 2026-10-30: before (~10,000
 blocks earlier) and after the 29 Oct 2026 freeze (frozen bit set, LTV 75 % -> 0)."""
-from btcagent.agent.core import ROOT, Agent
-from btcagent.execution.paper import PaperExecutor
-from btcagent.risk.protocol_status import decode_aave_v3_config
-from btcagent.types import LendIntent, Prices
+from cryptoagent.agent.core import ROOT, Agent
+from cryptoagent.execution.paper import PaperExecutor
+from cryptoagent.risk.protocol_status import decode_aave_v3_config
+from cryptoagent.types import LendIntent, Prices
 
 BEFORE = 7237005577332262213973186568752004119305653224248996801175139707821393190220
 AFTER = 7237005577332262213973186568752004119305653224248996801175283823009469038592

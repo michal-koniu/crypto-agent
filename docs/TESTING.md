@@ -46,7 +46,7 @@ Aave, convert all stables to cbBTC, then new deposits and strategy trades are re
 
 ## 5. Fresh install, end to end - ~25 min
 ```bash
-BRANCH=feat/initial-harness scripts/e2e_fresh_install.sh git@github.com:michal-koniu/btc-agent.git
+BRANCH=feat/initial-harness scripts/e2e_fresh_install.sh git@github.com:michal-koniu/crypto-agent.git
 ```
 Clone → install → frozen verify → data refresh → tests → a live decision cycle (news reader, 3 analyst samples,
 critic, policy, paper execution) → risk tick → upkeep → requested reflection → evidence (served model names, GPU
@@ -54,20 +54,20 @@ activity samples, ledger verify) → tax export.
 
 ## 6. Soak (hours)
 ```bash
-cp deploy/systemd/btcagent-soak.service ~/.config/systemd/user/ && systemctl --user daemon-reload
-systemctl --user start btcagent-soak                 # paper, decides every 60 min, separate state dir
-scripts/soak_monitor.sh ~/.local/state/btcagent-soak &   # CSV every 5 min: RSS, RAM, VRAM, GPU activity, ledger
+cp deploy/systemd/cryptoagent-soak.service ~/.config/systemd/user/ && systemctl --user daemon-reload
+systemctl --user start cryptoagent-soak                 # paper, decides every 60 min, separate state dir
+scripts/soak_monitor.sh ~/.local/state/cryptoagent-soak &   # CSV every 5 min: RSS, RAM, VRAM, GPU activity, ledger
 # fault injection (the agent reads <state>/faults.json):
-echo '{"exchange_down": true, "until": "<iso time>"}' > ~/.local/state/btcagent-soak/faults.json
-echo '{"llm_down": ["rig"], "until": "<iso time>"}'    > ~/.local/state/btcagent-soak/faults.json
-kill -9 $(systemctl --user show -p MainPID --value btcagent-soak)        # crash -> systemd restarts it
-systemctl --user stop btcagent-soak && systemctl --user start btcagent-soak  # graceful restart ("reboot")
-.venv/bin/python scripts/soak_report.py ~/.local/state/btcagent-soak       # summary + integrity
+echo '{"exchange_down": true, "until": "<iso time>"}' > ~/.local/state/cryptoagent-soak/faults.json
+echo '{"llm_down": ["rig"], "until": "<iso time>"}'    > ~/.local/state/cryptoagent-soak/faults.json
+kill -9 $(systemctl --user show -p MainPID --value cryptoagent-soak)        # crash -> systemd restarts it
+systemctl --user stop cryptoagent-soak && systemctl --user start cryptoagent-soak  # graceful restart ("reboot")
+.venv/bin/python scripts/soak_report.py ~/.local/state/cryptoagent-soak       # summary + integrity
 ```
 
 ## 7. Strategy research (reproducible)
 ```bash
-.venv/bin/python scripts/research_variants.py ~/.local/share/btcagent/data reports/variants_v1.json
+.venv/bin/python scripts/research_variants.py ~/.local/share/cryptoagent/data reports/variants_v1.json
 ```
 
 ## When something fails

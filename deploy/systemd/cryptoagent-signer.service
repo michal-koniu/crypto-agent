@@ -7,9 +7,9 @@ After=network-online.target
 
 [Service]
 Type=simple
-WorkingDirectory=%h/Desktop/github_repos/btc-agent
-Environment=BTCAGENT_KEYSTORE_PASSWORD_CMD=bw-secret btc-agent#keystore-password
-ExecStart=%h/Desktop/github_repos/btc-agent/.venv/bin/btcagent signer --keystore %h/.local/state/btcagent/keystore.json --mode fork
+WorkingDirectory=%h/Desktop/github_repos/crypto-agent
+Environment=CRYPTOAGENT_KEYSTORE_PASSWORD_CMD=bw-secret crypto-agent#keystore-password
+ExecStart=%h/Desktop/github_repos/crypto-agent/.venv/bin/cryptoagent signer --keystore %h/.local/state/cryptoagent/keystore.json --mode fork
 Restart=on-failure
 RestartSec=10
 MemoryMax=512M

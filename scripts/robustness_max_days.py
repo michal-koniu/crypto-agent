@@ -1,10 +1,10 @@
 import sys
 import copy, json
 import numpy as np
-from btcagent.data import history, features
-from btcagent.improve import gatekeeper, stats
-from btcagent.backtest import engine, metrics
-daily = history.panel(sys.argv[2] if len(sys.argv) > 2 else "/home/mkoniu/.local/share/btcagent/data"); feat = features.build(daily)
+from cryptoagent.data import history, features
+from cryptoagent.improve import gatekeeper, stats
+from cryptoagent.backtest import engine, metrics
+daily = history.panel(sys.argv[2] if len(sys.argv) > 2 else "/home/mkoniu/.local/share/cryptoagent/data"); feat = features.build(daily)
 base = gatekeeper.champion_params(gatekeeper.load_strategies())
 rows = []
 import sys

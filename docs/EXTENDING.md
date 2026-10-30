@@ -4,7 +4,7 @@ Rule of thumb: **new capability = human work + frozen-layer review**. The agent 
 parameters and its playbook (SELF_IMPROVEMENT.md D6).
 
 ## A new strategy
-1. Write the rule as a pure function in `btcagent/strategies/rules.py` (features in → target weights + stops +
+1. Write the rule as a pure function in `cryptoagent/strategies/rules.py` (features in → target weights + stops +
    rule states out; point-in-time only). Add its params to `evolvable/strategies.yaml` and bounds to
    `frozen/param_bounds.yaml`.
 2. Pre-register variants in a new `scripts/research_*.py` **before** looking at results; record the date in
@@ -12,10 +12,10 @@ parameters and its playbook (SELF_IMPROVEMENT.md D6).
 3. It must beat the champion in the gatekeeper's terms (full history, ≤1 worse cycle, all stress windows,
    bootstrap p ≤ 0.2), then run in shadow (add it as a `Book` in `ImprovementLoop.setup_shadows`) for ≥ 8 weeks.
 4. Re-lock the frozen layer; promote by editing `evolvable/strategies.yaml` (a git commit) or via a forced proposal
-   (`btcagent review`).
+   (`cryptoagent review`).
 
 ## A new protocol (e.g. a Morpho USDC vault)
-1. `btcagent risk-check <token or vault address>`; read audits; check DefiLlama hacks and L2Beat.
+1. `cryptoagent risk-check <token or vault address>`; read audits; check DefiLlama hacks and L2Beat.
 2. Add the contract with only the selectors you need to `frozen/allowlists.yaml` (`contracts`, and the spender under
    `token_approvals.spenders`), a protocol entry with `max_weight`, then re-lock.
 3. Implement `lend()` for it in `execution/evm.py` (approve exact → call → revoke), extend
@@ -27,7 +27,7 @@ Add it under `chains`, `tokens`, `contracts` in the allowlists; point an `EvmExe
 
 ## A new venue (CEX)
 Add `venues.<id>` with its `ccxt_id`, `cex_pairs`, fees in `execution/market.py::VENUE_FEES_BPS`, keys in the
-signer's environment (trade-only), and test against its demo/testnet first (`BTCAGENT_<VENUE>_DEMO=1`).
+signer's environment (trade-only), and test against its demo/testnet first (`CRYPTOAGENT_<VENUE>_DEMO=1`).
 
 ## A new model or provider
 `config/models.yaml` only: add a provider (`kind: openai` for any OpenAI-compatible API) and reference it from a

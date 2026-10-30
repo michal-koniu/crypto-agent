@@ -1,11 +1,11 @@
 # HUMAN-OWNED. The agent can read this file but can never change it.
 # The core refuses to start if this file's hash differs from frozen/frozen.lock
-# (re-lock after an edit with:  btcagent frozen lock).
+# (re-lock after an edit with:  cryptoagent frozen lock).
 #
 # All percentages are fractions of NAV (net asset value) unless stated.
 # NAV is measured in BTC; USD values are used only for absolute caps.
 
-stage: paper            # backtest | paper | fork | live   (live also needs BTCAGENT_LIVE=I_ACCEPT_REAL_LOSSES)
+stage: paper            # backtest | paper | fork | live   (live also needs CRYPTOAGENT_LIVE=I_ACCEPT_REAL_LOSSES)
 capital_cap_usd: 100    # live stage: the agent manages at most this much; anything above stays untouched
 
 position:

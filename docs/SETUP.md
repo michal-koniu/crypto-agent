@@ -3,11 +3,11 @@
 ## 1. Install from scratch (Ubuntu 24.04, Python 3.12; tested on the rig 2026-10-29)
 
 ```bash
-cd ~/Desktop/github_repos && git clone git@github.com:michal-koniu/btc-agent.git && cd btc-agent
+cd ~/Desktop/github_repos && git clone git@github.com:michal-koniu/crypto-agent.git && cd crypto-agent
 python3 -m venv .venv
 .venv/bin/pip install -U pip && .venv/bin/pip install -e ".[dev]" yfinance
-.venv/bin/btcagent frozen verify          # {"intact": true}
-.venv/bin/btcagent data refresh           # ~8 min: CoinMetrics, Binance monthly files, Treasury, NY Fed, ...
+.venv/bin/cryptoagent frozen verify          # {"intact": true}
+.venv/bin/cryptoagent data refresh           # ~8 min: CoinMetrics, Binance monthly files, Treasury, NY Fed, ...
 .venv/bin/python -m pytest -q             # unit + integration; see TESTING.md for live-LLM and fork suites
 ```
 Optional for fork testing: Docker (the rig has it) - `scripts/fork.sh start` pulls Foundry's official image.
@@ -27,8 +27,8 @@ Models: llama-swap on `localhost:8080` (RIG.md). Nothing else to install.
 | `evolvable/strategies.yaml` | agent via gatekeeper | champion strategy and params (versioned, git-committed on change) |
 | `evolvable/playbook.yaml` | agent via gatekeeper | analyst guidance, lessons, procedures (itemised, counters) |
 
-After editing anything in `frozen/` (or the frozen code listed in `btcagent/frozen.py`): review the diff, then
-`btcagent frozen lock --confirm I-AM-THE-HUMAN-OWNER`. Without re-locking, the agent halts itself.
+After editing anything in `frozen/` (or the frozen code listed in `cryptoagent/frozen.py`): review the diff, then
+`cryptoagent frozen lock --confirm I-AM-THE-HUMAN-OWNER`. Without re-locking, the agent halts itself.
 
 ### config/agent.yaml reference
 * `mode`: `paper` | `fork` | `live`. `executor`: `paper` (live prices, simulated fills) | `evm` (Base via signer).
@@ -37,7 +37,7 @@ After editing anything in `frozen/` (or the frozen code listed in `btcagent/froz
 * `trading.min_trade_nav_fraction` (0.05): smaller weight changes are ignored (anti-churn).
 * `yield.*`: protocol, keep_liquid_fraction, min_usd, expected_apy, lockup_hours.
 * `analyst.enabled` (false = rules only), `samples`, `critic`. `news.enabled`, `since_hours`.
-* `alerts.email_to`, `email_enabled`, `telegram_enabled` (env `BTCAGENT_TELEGRAM_TOKEN`, `BTCAGENT_TELEGRAM_CHAT`).
+* `alerts.email_to`, `email_enabled`, `telegram_enabled` (env `CRYPTOAGENT_TELEGRAM_TOKEN`, `CRYPTOAGENT_TELEGRAM_CHAT`).
 
 ### config/models.yaml reference
 * `providers.<name>`: `kind` (openai|anthropic), `base_url`, `api_key_env`, `price_per_mtok`.
@@ -51,32 +51,32 @@ After editing anything in `frozen/` (or the frozen code listed in `btcagent/froz
 
 | Stage | What runs | Gate to the next stage (human decision) |
 |---|---|---|
-| 0 Backtest | `btcagent backtest --variants`; `pytest` | the champion beats HODL over full history and survives the stress windows (done: STRATEGY.md) |
-| 1 Paper | `mode: paper`, `executor: paper`, `btcagent run` 24/7 with 100 USDC of paper money | ≥ 8 weeks without errors; ledger verifies; forecasts are scored; the overlay vs `rules_champion` shadow is understood |
+| 0 Backtest | `cryptoagent backtest --variants`; `pytest` | the champion beats HODL over full history and survives the stress windows (done: STRATEGY.md) |
+| 1 Paper | `mode: paper`, `executor: paper`, `cryptoagent run` 24/7 with 100 USDC of paper money | ≥ 8 weeks without errors; ledger verifies; forecasts are scored; the overlay vs `rules_champion` shadow is understood |
 | 2 Fork | `mode: fork`, `executor: evm`, signer + Anvil fork | every fork test passes (TESTING.md §4); a kill switch drill on the fork |
 | 3 Live, tiny | `stage: live`, `capital_cap_usd: 100`, 100 USDC on Base (or OKX) | ≥ 3 months; no limit breach; behaviour matches the paper shadow |
 | 4 Scale | raise `capital_cap_usd` in steps (e.g. 500 → 2,000 → 5,000); add Safe + Zodiac Roles before 5,000 | each step ≥ 1 month clean |
 
 ## 4. Wallet and keys (stage 2+)
 
-* Create a **new** wallet for the agent - not your MetaMask account: `btcagent keystore create ~/.local/state/btcagent/keystore.json`
-  (prompts nothing; password from `BTCAGENT_KEYSTORE_PASSWORD_CMD`, e.g. `bw-secret btc-agent#keystore-password`).
+* Create a **new** wallet for the agent - not your MetaMask account: `cryptoagent keystore create ~/.local/state/cryptoagent/keystore.json`
+  (prompts nothing; password from `CRYPTOAGENT_KEYSTORE_PASSWORD_CMD`, e.g. `bw-secret crypto-agent#keystore-password`).
   Only the address is printed. Fund it from MetaMask with USDC on Base (and ~$2 of ETH on Base for gas).
   The 100 USDT: swap to USDC first (USDT is not tradable on MiCA venues; on Base, USDC is the deep market).
 * CEX (optional): create an OKX Europe API key with **trade permission only, withdrawals disabled, IP whitelist =
-  the rig**; put it in Bitwarden; the signer service reads `BTCAGENT_OKX_KEY/_SECRET/_PASSPHRASE` from its own
-  environment. Test first with OKX EEA demo trading (`BTCAGENT_OKX_DEMO=1`).
+  the rig**; put it in Bitwarden; the signer service reads `CRYPTOAGENT_OKX_KEY/_SECRET/_PASSPHRASE` from its own
+  environment. Test first with OKX EEA demo trading (`CRYPTOAGENT_OKX_DEMO=1`).
 * Set `kill_switch.safe_address` (e.g. your MetaMask address) in `frozen/limits.yaml` and re-lock.
 
 ## 5. Going live - the three human steps (never on by default)
 
-1. `frozen/limits.yaml`: `stage: live`, a `capital_cap_usd`, a `safe_address` → review → `btcagent frozen lock --confirm ...`.
-2. `config/agent.yaml`: `mode: live`, `executor: evm` (or a CEX executor), and start `btcagent-signer` with `--mode live`.
-3. The agent's environment: `BTCAGENT_LIVE=I_ACCEPT_REAL_LOSSES` (systemd `Environment=`).
+1. `frozen/limits.yaml`: `stage: live`, a `capital_cap_usd`, a `safe_address` → review → `cryptoagent frozen lock --confirm ...`.
+2. `config/agent.yaml`: `mode: live`, `executor: evm` (or a CEX executor), and start `cryptoagent-signer` with `--mode live`.
+3. The agent's environment: `CRYPTOAGENT_LIVE=I_ACCEPT_REAL_LOSSES` (systemd `Environment=`).
 Missing any one of the three, the policy engine (and the signer) refuse every live action.
 
 ## 6. Upgrading
 
 `git pull`, `pip install -e .`, `pytest -q`, review `git diff` of `frozen/` and frozen code, re-lock if intended,
-`systemctl --user restart btcagent`. A model or runtime change is treated as a challenger (SELF_IMPROVEMENT.md
+`systemctl --user restart cryptoagent`. A model or runtime change is treated as a challenger (SELF_IMPROVEMENT.md
 rule 15): run the live-LLM suite and a replay before switching.

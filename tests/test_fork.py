@@ -8,13 +8,13 @@ import httpx
 import pytest
 from web3 import Web3
 
-from btcagent import frozen
-from btcagent.execution.evm import ERC20_ABI, EvmExecutor
-from btcagent.ledger.store import Ledger
-from btcagent.policy.engine import PolicyContext, check
-from btcagent.signer import keystore
-from btcagent.signer.client import SignerClient, SignerRefused
-from btcagent.types import LendIntent, Prices, StopRule, TradeIntent
+from cryptoagent import frozen
+from cryptoagent.execution.evm import ERC20_ABI, EvmExecutor
+from cryptoagent.ledger.store import Ledger
+from cryptoagent.policy.engine import PolicyContext, check
+from cryptoagent.signer import keystore
+from cryptoagent.signer.client import SignerClient, SignerRefused
+from cryptoagent.types import LendIntent, Prices, StopRule, TradeIntent
 
 RPC = "http://127.0.0.1:8545"
 
@@ -67,10 +67,10 @@ def set_reserve_frozen(ex, asset: str, frozen_flag: bool):
 def env(tmp_path_factory):
     import os
     d = tmp_path_factory.mktemp("fork")
-    os.environ["BTCAGENT_KEYSTORE_PASSWORD"] = "fork-test-only"
+    os.environ["CRYPTOAGENT_KEYSTORE_PASSWORD"] = "fork-test-only"
     ks = d / "k.json"
     addr = keystore.create(ks)
-    from btcagent.signer.server import serve
+    from cryptoagent.signer.server import serve
     threading.Thread(target=serve, args=(str(d), str(ks), "fork", 18795), daemon=True).start()
     for _ in range(50):
         if (d / "signer.token").exists():
@@ -90,8 +90,8 @@ def env(tmp_path_factory):
     h = rpc("eth_sendTransaction", [{"from": a_token, "to": usdc, "data": data}])
     w3.eth.wait_for_transaction_receipt(h, timeout=60)
     rpc("anvil_stopImpersonatingAccount", [a_token])
-    from btcagent.execution.market import Market
-    from btcagent.risk.protocol_status import from_allowlists
+    from cryptoagent.execution.market import Market
+    from cryptoagent.risk.protocol_status import from_allowlists
     prices = Market().prices()
     live = from_allowlists(RPC, frozen.allowlists(), w3=w3, ttl_seconds=0).status("aave_v3_base", "USDC")
     if live["frozen"]:
@@ -138,7 +138,7 @@ def test_aave_supply_and_withdraw(env):
 
 def test_protocol_guard_on_fork(env, tmp_path):
     """The real Aave contracts: a frozen reserve gets no deposit, and money already in it is withdrawn by the guard."""
-    from btcagent.agent.core import Agent, ROOT
+    from cryptoagent.agent.core import Agent, ROOT
     ex = env["ex"]
     agent = Agent(ROOT / "config" / "agent.yaml", overrides={"mode": "fork", "state_dir": str(tmp_path), "alerts_dry_run": True,
                                                              "analyst": {"enabled": False}, "news": {"enabled": False},
@@ -184,8 +184,8 @@ def test_signer_refuses_hostile_transactions_on_fork(env):
 
 def test_kill_switch_procedure_on_fork(env, tmp_path):
     """Manual kill (mode to_btc): withdraw from Aave, convert every stablecoin into cbBTC, then only exits are signed."""
-    from btcagent.agent.core import Agent, ROOT
-    from btcagent.risk import killswitch
+    from cryptoagent.agent.core import Agent, ROOT
+    from cryptoagent.risk import killswitch
     ex = env["ex"]
     ex.lend(LendIntent(action="supply", venue="aave_v3_base", chain="base", asset="USDC", qty=100.0))
     agent = Agent(ROOT / "config" / "agent.yaml", overrides={"mode": "fork", "state_dir": str(env["dir"]), "alerts_dry_run": True,
@@ -226,8 +226,8 @@ def test_kill_switch_procedure_on_fork(env, tmp_path):
 def test_automatic_kill_on_realised_drawdown_on_fork(env):
     """A realised BTC drawdown beyond the frozen limit engages the kill switch with no human action."""
     import json as _json
-    from btcagent.agent.core import Agent, ROOT
-    from btcagent.risk import killswitch
+    from cryptoagent.agent.core import Agent, ROOT
+    from cryptoagent.risk import killswitch
     ex = env["ex"]
     agent = Agent(ROOT / "config" / "agent.yaml", overrides={"mode": "fork", "state_dir": str(env["dir"]), "alerts_dry_run": True,
                                                              "analyst": {"enabled": False}, "news": {"enabled": False}})

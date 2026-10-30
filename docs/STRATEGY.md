@@ -126,13 +126,13 @@ on the same ~4 cycles: it is data snooping until forward evidence accumulates. T
 * **240 days** passes every gate (8.82×, bootstrap p = 0.001, equal or better in all five stress windows). It was
   checked *after* the 210 rejection, so it is selected evidence; it is used in the self-improvement test to exercise
   the promotion path. **Submitted to the paper agent on 2026-10-30** (the owner asked for the agent to be taken all the
-  way without approvals): `btcagent propose --target cycle_guard.max_days_in_stable --value 240 ...` → static ✓,
+  way without approvals): `cryptoagent propose --target cycle_guard.max_days_in_stable --value 240 ...` → static ✓,
   all five must-pass windows ✓, 8.82× vs 1.55×, bootstrap p = 0.001, deflated Sharpe 0.65 (t = 801 weeks) →
   **shadow started**. The selection problem is handled by the forward process, not by the backtest: the champion holds
   BTC now, so the challenger cannot act differently in shadow; it will run the full 12 weeks and, if promoted, be
   flagged `offline_only_no_divergence_in_shadow`, and its probation keeps the old champion in shadow with automatic
   rollback armed until the two have actually differed for 12 weeks — i.e. through the next bear market's re-entry
-  (SELF_IMPROVEMENT §2). The owner can withdraw it at any time: `btcagent withdraw --why "..."` cancels the
+  (SELF_IMPROVEMENT §2). The owner can withdraw it at any time: `cryptoagent withdraw --why "..."` cancels the
   challenger in shadow (or, after a promotion, rolls back through the normal rollback path); it is logged and is not
   counted as a rejection.
 * A second finding while testing: **the re-entry ladder never fires** in `cycle_guard_v2`. It requires the exit signal

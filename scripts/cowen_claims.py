@@ -75,8 +75,8 @@ def fetch(ids_file: str, out_dir: str, gap_s: float = 45.0):
 
 
 def extract(tdir: str, dates_tsv: str, out_file: str):
-    from btcagent.frozen import ROOT
-    from btcagent.llm.router import Router, load_config
+    from cryptoagent.frozen import ROOT
+    from cryptoagent.llm.router import Router, load_config
     dates = {}
     for line in open(dates_tsv):
         parts = line.rstrip("\n").replace("\\t", "|").split("|")
@@ -109,7 +109,7 @@ def extract(tdir: str, dates_tsv: str, out_file: str):
 def score(claims_file: str, data_dir: str, out_file: str):
     """Score unconditional BTC / ETHBTC direction and level claims whose horizon has passed (code only)."""
     import pandas as pd
-    from btcagent.data import history
+    from cryptoagent.data import history
     panel = history.panel(data_dir)
     series = {"BTC": panel["btc"], "ETHBTC": panel.get("eth_btc"), "ETH": panel.get("eth_usd"),
               "BTC_DOMINANCE": panel.get("btc_dom_proxy")}

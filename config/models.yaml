@@ -14,7 +14,7 @@
 providers:
   rig:
     kind: openai
-    base_url: ${BTCAGENT_RIG_URL:-http://localhost:8080/v1}
+    base_url: ${CRYPTOAGENT_RIG_URL:-http://localhost:8080/v1}
     api_key_env: null              # llama-swap accepts any key
     price_per_mtok: {in: 0.0, out: 0.0}
   anthropic:

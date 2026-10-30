@@ -1,5 +1,5 @@
 # HUMAN-OWNED allowlists. Anything not listed here cannot be touched by the agent.
-# Adding an entry is a human decision, made after `btcagent risk-check <address>` and reading its report.
+# Adding an entry is a human decision, made after `cryptoagent risk-check <address>` and reading its report.
 # Addresses are verified on-chain at start-up in fork/live mode (code present, symbol/decimals match).
 
 chains:

@@ -110,7 +110,7 @@ while the analyst ran, GPU 2+3 at 95 % during reader/critic phases. The cycle to
 the self-improvement test shared the GPUs. In this run the critic fell back from qwen3.6 to qwen3.8 (malformed
 JSON) - bug 12 below, fixed.
 
-## 7. Soak (`btcagent-soak.service`, paper, hourly decisions, 29 Oct 18:41 → 30 Oct 00:45 UTC = **6.06 h**)
+## 7. Soak (`cryptoagent-soak.service`, paper, hourly decisions, 29 Oct 18:41 → 30 Oct 00:45 UTC = **6.06 h**)
 Live local models, real OKX/Kraken prices and real RSS news; faults injected on a schedule by
 `scripts/soak_faults.sh` (log: `reports/soak_faults_20261030.log`); resources sampled every 5 minutes
 (`reports/soak_monitor_20261030.csv`, 76 samples); summary `reports/soak_20261030.json` (`scripts/soak_report.py`).

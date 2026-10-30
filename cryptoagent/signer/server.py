@@ -1,10 +1,10 @@
 """The signer daemon: holds keys, signs only what its own policy allows, never talks to an LLM.
 
-Runs as its own process (`btcagent signer`), listening on 127.0.0.1 with a bearer token written to a 0600 file in
+Runs as its own process (`cryptoagent signer`), listening on 127.0.0.1 with a bearer token written to a 0600 file in
 the state directory. The core asks it to sign; it answers with a raw signed transaction or a refusal with reasons.
 
 Keys: the EVM key comes from an encrypted keystore (see keystore.py). CEX API keys come from the environment of
-this process only (BTCAGENT_OKX_KEY / _SECRET / _PASSPHRASE etc., normally injected from Bitwarden by the
+this process only (CRYPTOAGENT_OKX_KEY / _SECRET / _PASSPHRASE etc., normally injected from Bitwarden by the
 systemd unit) and must be created on the exchange with trading permission only - no withdrawals. The signer exposes
 no withdrawal endpoint for any venue.
 """
@@ -100,12 +100,12 @@ class Signer:
         import ccxt
         cfg = self.allow["venues"][venue]
         up = venue.upper()
-        params = {"apiKey": os.environ.get(f"BTCAGENT_{up}_KEY"), "secret": os.environ.get(f"BTCAGENT_{up}_SECRET"),
-                  "password": os.environ.get(f"BTCAGENT_{up}_PASSPHRASE"), "enableRateLimit": True}
+        params = {"apiKey": os.environ.get(f"CRYPTOAGENT_{up}_KEY"), "secret": os.environ.get(f"CRYPTOAGENT_{up}_SECRET"),
+                  "password": os.environ.get(f"CRYPTOAGENT_{up}_PASSPHRASE"), "enableRateLimit": True}
         if not params["apiKey"]:
             raise RuntimeError(f"no API key for {venue} in the signer's environment")
         ex = getattr(ccxt, cfg["ccxt_id"])(params)
-        if os.environ.get(f"BTCAGENT_{up}_DEMO") == "1":
+        if os.environ.get(f"CRYPTOAGENT_{up}_DEMO") == "1":
             ex.set_sandbox_mode(True)            # OKX demo trading (EEA) / exchange testnets
         self._cex[venue] = ex
         return ex
@@ -113,7 +113,7 @@ class Signer:
     def cex_order(self, body: dict) -> tuple[int, dict]:
         v = check_cex_order(body["venue"], body["symbol"], body["side"], float(body["amount"]),
                             float(body.get("notional_usd", 0)), self.allow, self.limits, self.killed)
-        if self.mode not in ("live", "fork") and os.environ.get(f"BTCAGENT_{body['venue'].upper()}_DEMO") != "1":
+        if self.mode not in ("live", "fork") and os.environ.get(f"CRYPTOAGENT_{body['venue'].upper()}_DEMO") != "1":
             v.append(f"signer: real CEX orders need mode live (or the venue's demo flag); mode is {self.mode}")
         if self.mode == "live" and self.limits.get("stage") != "live":
             v.append("signer: frozen stage is not live")

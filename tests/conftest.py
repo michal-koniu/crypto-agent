@@ -7,11 +7,11 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from btcagent.ledger.store import Ledger  # noqa: E402
-from btcagent.policy.engine import PolicyContext  # noqa: E402
-from btcagent.types import CostEstimate, Holding, Portfolio, Prices  # noqa: E402
+from cryptoagent.ledger.store import Ledger  # noqa: E402
+from cryptoagent.policy.engine import PolicyContext  # noqa: E402
+from cryptoagent.types import CostEstimate, Holding, Portfolio, Prices  # noqa: E402
 
-DATA_DIR = Path(os.environ.get("BTCAGENT_DATA_DIR", "~/.local/share/btcagent/data")).expanduser()
+DATA_DIR = Path(os.environ.get("CRYPTOAGENT_DATA_DIR", "~/.local/share/cryptoagent/data")).expanduser()
 
 
 @pytest.fixture
@@ -52,7 +52,7 @@ def cheap_cost():
 def has_rig_llm() -> bool:
     try:
         import httpx
-        return httpx.get(os.environ.get("BTCAGENT_RIG_URL", "http://localhost:8080/v1").rstrip("/") + "/models", timeout=5).status_code == 200
+        return httpx.get(os.environ.get("CRYPTOAGENT_RIG_URL", "http://localhost:8080/v1").rstrip("/") + "/models", timeout=5).status_code == 200
     except Exception:
         return False
 

@@ -14,9 +14,9 @@ from pathlib import Path
 import numpy as np
 import yaml
 
-from btcagent.backtest import engine, metrics
-from btcagent.data import features, history
-from btcagent.improve import stats
+from cryptoagent.backtest import engine, metrics
+from cryptoagent.data import features, history
+from cryptoagent.improve import stats
 
 BASE = yaml.safe_load(open("evolvable/strategies.yaml"))["strategies"]["cycle_guard_v1"]
 OFF = {"trim_fraction": 0.0, "trim_risk": 1.01, "trim_resid_pct": 1.01}

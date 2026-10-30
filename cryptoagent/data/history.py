@@ -24,7 +24,7 @@ from pathlib import Path
 import httpx
 import pandas as pd
 
-UA = {"User-Agent": "btc-agent/0.1 (research; personal use)"}
+UA = {"User-Agent": "crypto-agent/0.1 (research; personal use)"}
 CM_URL = "https://community-api.coinmetrics.io/v4/timeseries/asset-metrics"
 CM_BTC_METRICS = ["PriceUSD", "CapMrktCurUSD", "CapMVRVCur", "SplyCur", "HashRate", "IssTotUSD", "FlowInExUSD", "FlowOutExUSD"]
 CM_ALTS = ["eth", "bnb", "xrp", "ada", "doge", "ltc", "link", "avax", "dot", "trx"]
@@ -176,7 +176,7 @@ def panel(data_dir: str | Path) -> pd.DataFrame:
     d = Path(data_dir)
     b = _read(d, "cm_btc")
     if b is None:
-        raise FileNotFoundError(f"{d}/cm_btc.csv missing - run `btcagent data refresh` first")
+        raise FileNotFoundError(f"{d}/cm_btc.csv missing - run `cryptoagent data refresh` first")
     out = pd.DataFrame(index=b.index)
     out["btc"] = b["PriceUSD"]
     out["btc_mcap"] = b["CapMrktCurUSD"]

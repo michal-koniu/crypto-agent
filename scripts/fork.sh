@@ -3,9 +3,9 @@
 #   scripts/fork.sh start [rpc_url]    pinned to (head - 100) so the fork is reproducible during a test run
 #   scripts/fork.sh stop
 set -euo pipefail
-NAME=btcagent-anvil
+NAME=cryptoagent-anvil
 IMG=ghcr.io/foundry-rs/foundry:stable
-RPC=${2:-${BTCAGENT_BASE_RPC:-https://mainnet.base.org}}
+RPC=${2:-${CRYPTOAGENT_BASE_RPC:-https://mainnet.base.org}}
 case "${1:-start}" in
   start)
     sg docker -c "docker rm -f $NAME" >/dev/null 2>&1 || true

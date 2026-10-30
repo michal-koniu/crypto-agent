@@ -1,4 +1,4 @@
-"""Command line: `btcagent <command>` (or `python -m btcagent.cli <command>`). See docs/OPERATIONS.md."""
+"""Command line: `cryptoagent <command>` (or `python -m cryptoagent.cli <command>`). See docs/OPERATIONS.md."""
 from __future__ import annotations
 
 import argparse
@@ -18,7 +18,7 @@ def _agent(args):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(prog="btcagent")
+    ap = argparse.ArgumentParser(prog="cryptoagent")
     ap.add_argument("--config", default=None)
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("run", help="run the 24/7 daemon")
@@ -71,8 +71,8 @@ def main(argv=None):
             print(json.dumps({"intact": not p, "problems": p}, indent=1))
             return 0 if not p else 2
         if args.confirm != HUMAN_CONFIRM:
-            print(f"Re-locking the frozen layer is a human decision. Review `git diff frozen/ btcagent/` first, then run:\n"
-                  f"  btcagent frozen lock --confirm {HUMAN_CONFIRM}")
+            print(f"Re-locking the frozen layer is a human decision. Review `git diff frozen/ cryptoagent/` first, then run:\n"
+                  f"  cryptoagent frozen lock --confirm {HUMAN_CONFIRM}")
             return 3
         print(json.dumps(frozen.write_lock(), indent=1))
         return 0
@@ -134,7 +134,7 @@ def main(argv=None):
         from .risk import killswitch
         if args.release:
             if args.confirm != HUMAN_CONFIRM:
-                print(f"Releasing the kill switch is a human decision: btcagent kill --release --confirm {HUMAN_CONFIRM}")
+                print(f"Releasing the kill switch is a human decision: cryptoagent kill --release --confirm {HUMAN_CONFIRM}")
                 return 3
             killswitch.release(agent.state, agent.ledger, who="human via CLI")
             agent._save("kill_done.json", {"done": False})

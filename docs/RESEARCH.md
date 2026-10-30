@@ -29,7 +29,7 @@ Six research reports were produced on 2026-10-29 before any code was written; ea
 | Swaps | **Uniswap v3 SwapRouter02 + QuoterV2** (works on a fork, quotes are pool state) | CoW Swap (best MEV protection, but off-chain solvers do not exist on a fork - a candidate for live); 0x/1inch (API keys); Odos (shut down 2026-07-30) |
 | Lending | **Aave v3 Base** (instant withdrawal unless 100 % utilised) | Morpho vaults (higher APY 5.5–6.8 %, curator risk; candidate via EXTENDING), Pendle (lockups) |
 | Stops | **own risk tick, BTC terms** | Gelato automations (reported end-of-life), CEX native stops (USD-denominated) |
-| Token/contract checks | **GoPlus** (no key) + on-chain code check (`btcagent risk-check`) | honeypot.is (Base only - fine as a manual second opinion); Etherscan Base API (paid) |
+| Token/contract checks | **GoPlus** (no key) + on-chain code check (`cryptoagent risk-check`) | honeypot.is (Base only - fine as a manual second opinion); Etherscan Base API (paid) |
 | Fork testing | **Anvil** (Foundry Docker image) pinned to head−100 on mainnet.base.org | Hardhat (slower; no need) |
 | BTC history, on-chain | **CoinMetrics Community** (2010→; MVRV, supply, hash rate, exchange flows) | Glassnode (no free plan); BGeometrics free tier (4 years, 15 req/day) |
 | Prices for backtests | **data.binance.vision** (2017→), OKX REST for the latest days | CoinDesk/CryptoCompare (free tier ended May 2026) |

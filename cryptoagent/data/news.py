@@ -48,7 +48,7 @@ def _clean(s: str, n: int) -> str:
 def fetch(since_hours: int = 30, feeds: dict = FEEDS) -> list[dict]:
     cutoff = datetime.now(timezone.utc) - timedelta(hours=since_hours)
     items, seen = [], set()
-    with httpx.Client(timeout=20, follow_redirects=True, headers={"User-Agent": "btc-agent/0.1"}) as c:
+    with httpx.Client(timeout=20, follow_redirects=True, headers={"User-Agent": "crypto-agent/0.1"}) as c:
         for name, (url, tier) in feeds.items():
             try:
                 parsed = feedparser.parse(c.get(url).content)

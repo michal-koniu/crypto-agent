@@ -7,11 +7,11 @@ from datetime import datetime, timedelta, timezone
 import pytest
 import yaml
 
-from btcagent import frozen
-from btcagent.improve import gatekeeper, stats
-from btcagent.improve.controller import Controller
-from btcagent.improve.playbook import Playbook
-from btcagent.llm.schemas import Proposal
+from cryptoagent import frozen
+from cryptoagent.improve import gatekeeper, stats
+from cryptoagent.improve.controller import Controller
+from cryptoagent.improve.playbook import Playbook
+from cryptoagent.llm.schemas import Proposal
 
 NOW = datetime(2026, 10, 29, tzinfo=timezone.utc)
 
@@ -63,13 +63,13 @@ def test_frozen_lock_detects_tampering(tmp_path):
     lim = root / "frozen" / "limits.yaml"
     lim.write_text(lim.read_text().replace("max_order_usd: 3500", "max_order_usd: 3500000"))
     assert any("limits.yaml" in p for p in frozen.verify_lock(root))
-    pe = root / "btcagent" / "policy" / "engine.py"
+    pe = root / "cryptoagent" / "policy" / "engine.py"
     pe.write_text(pe.read_text() + "\n# harmless-looking edit\n")
     assert any("engine.py" in p for p in frozen.verify_lock(root))
 
 
 def test_repo_frozen_layer_is_locked_and_intact():
-    assert frozen.verify_lock() == [], "run `btcagent frozen lock` after reviewing changes"
+    assert frozen.verify_lock() == [], "run `cryptoagent frozen lock` after reviewing changes"
 
 
 def test_playbook_delta_edits_dedup_cap_and_retire(tmp_path):
@@ -161,8 +161,8 @@ def test_loop_identical_challenger_promoted_late_and_rollback_stays_armed(tmp_pa
     max_weeks, flagged offline-only; its probation goes dormant instead of passing; parameter proposals are refused
     meanwhile; when the two finally diverge and the new one underperforms, the rollback still fires."""
     import math
-    from btcagent.backtest.book import Book
-    from btcagent.improve.loop import ImprovementLoop
+    from cryptoagent.backtest.book import Book
+    from cryptoagent.improve.loop import ImprovementLoop
     sp, pp = tmp_path / "strategies.yaml", tmp_path / "playbook.yaml"
     shutil.copy(frozen.ROOT / "evolvable" / "strategies.yaml", sp)
     shutil.copy(frozen.ROOT / "evolvable" / "playbook.yaml", pp)
@@ -243,8 +243,8 @@ def test_boolean_params_parse_strictly():
 
 
 def test_human_withdraw_cancels_shadow_without_counting_a_rejection(tmp_path, ledger):
-    from btcagent.backtest.book import Book
-    from btcagent.improve.loop import ImprovementLoop
+    from cryptoagent.backtest.book import Book
+    from cryptoagent.improve.loop import ImprovementLoop
     sp, pp = tmp_path / "strategies.yaml", tmp_path / "playbook.yaml"
     shutil.copy(frozen.ROOT / "evolvable" / "strategies.yaml", sp)
     shutil.copy(frozen.ROOT / "evolvable" / "playbook.yaml", pp)

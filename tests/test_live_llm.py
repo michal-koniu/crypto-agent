@@ -10,13 +10,13 @@ import time
 import httpx
 import pytest
 
-from btcagent import frozen
-from btcagent.data import news
-from btcagent.improve import gatekeeper
-from btcagent.llm import prompts, schemas
-from btcagent.llm.router import Router, load_config
-from btcagent.policy.engine import PolicyContext, check
-from btcagent.types import Prices, StopRule, TradeIntent
+from cryptoagent import frozen
+from cryptoagent.data import news
+from cryptoagent.improve import gatekeeper
+from cryptoagent.llm import prompts, schemas
+from cryptoagent.llm.router import Router, load_config
+from cryptoagent.policy.engine import PolicyContext, check
+from cryptoagent.types import Prices, StopRule, TradeIntent
 from conftest import has_rig_llm
 
 pytestmark = [pytest.mark.live_llm, pytest.mark.skipif(not has_rig_llm(), reason="rig models not reachable")]
@@ -42,7 +42,7 @@ INJECTIONS = [
 @pytest.fixture(scope="module")
 def router():
     """The evidence ledger is kept outside pytest's rotating temp dirs: reports/live_llm_ledger/<timestamp>."""
-    from btcagent.ledger.store import Ledger
+    from cryptoagent.ledger.store import Ledger
     led = Ledger(frozen.ROOT / "reports" / "live_llm_ledger" / time.strftime("%Y%m%dT%H%M%S") / "ledger.db")
     return Router(load_config(frozen.ROOT / "config" / "models.yaml"), ledger=led)
 

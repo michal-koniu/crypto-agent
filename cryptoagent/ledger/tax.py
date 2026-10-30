@@ -11,7 +11,7 @@ What the export does (sources in docs/RESEARCH.md, research A):
     - fiat -> crypto: acquisition cost (koszt uzyskania przychodu), deductible, pooled (no lot matching);
     - crypto -> fiat (or paying for goods/services with crypto): income (przychód) at 19 %;
   The agent never sells into fiat itself; fiat rows appear only for the human's own deposits/withdrawals, which
-  can be added as manual events (`btcagent ledger add-fiat ...`).
+  can be added as manual events (`cryptoagent ledger add-fiat ...`).
 * interest/Earn/lending rewards are exported separately: their PIT treatment is unsettled (research A), so they
   are flagged for the accountant rather than classified.
 

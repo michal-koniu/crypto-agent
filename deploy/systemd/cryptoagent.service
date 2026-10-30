@@ -1,22 +1,22 @@
 # User service: the 24/7 agent loop (paper by default).
 # Install:  mkdir -p ~/.config/systemd/user && cp deploy/systemd/*.service ~/.config/systemd/user/
-#           systemctl --user daemon-reload && systemctl --user enable --now btcagent
+#           systemctl --user daemon-reload && systemctl --user enable --now cryptoagent
 #           loginctl enable-linger $USER     # keep user services running without a login session
 [Unit]
-Description=Crypto agent (btc-agent: portfolio measured in BTC, paper unless enabled)
+Description=Crypto agent (crypto-agent: portfolio measured in BTC, paper unless enabled)
 After=network-online.target llama-swap.service
 Wants=network-online.target
 
 [Service]
 Type=simple
-WorkingDirectory=%h/Desktop/github_repos/btc-agent
-ExecStart=%h/Desktop/github_repos/btc-agent/.venv/bin/btcagent run
+WorkingDirectory=%h/Desktop/github_repos/crypto-agent
+ExecStart=%h/Desktop/github_repos/crypto-agent/.venv/bin/cryptoagent run
 Restart=always
 RestartSec=30
 # memory guard: the rig's binding limit is RAM (60 GB); the agent itself needs < 1 GB
 MemoryMax=2G
 Environment=PYTHONUNBUFFERED=1
-# Secrets are NOT set here. CEX/wallet keys go only to btcagent-signer.service.
+# Secrets are NOT set here. CEX/wallet keys go only to cryptoagent-signer.service.
 
 [Install]
 WantedBy=default.target

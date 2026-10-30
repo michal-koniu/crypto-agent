@@ -5,8 +5,8 @@ After=network-online.target
 
 [Service]
 Type=simple
-WorkingDirectory=%h/Desktop/github_repos/btc-agent
-ExecStart=%h/Desktop/github_repos/btc-agent/.venv/bin/btcagent --config config/agent.soak.yaml run
+WorkingDirectory=%h/Desktop/github_repos/crypto-agent
+ExecStart=%h/Desktop/github_repos/crypto-agent/.venv/bin/cryptoagent --config config/agent.soak.yaml run
 Restart=always
 RestartSec=20
 MemoryMax=2G

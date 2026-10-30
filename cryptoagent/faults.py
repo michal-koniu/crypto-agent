@@ -20,7 +20,7 @@ def configure(state_dir) -> None:
 
 
 def active() -> dict:
-    p = _PATH or (Path(os.environ["BTCAGENT_STATE"]) / "faults.json" if os.environ.get("BTCAGENT_STATE") else None)
+    p = _PATH or (Path(os.environ["CRYPTOAGENT_STATE"]) / "faults.json" if os.environ.get("CRYPTOAGENT_STATE") else None)
     if not p or not p.exists():
         return {}
     try:

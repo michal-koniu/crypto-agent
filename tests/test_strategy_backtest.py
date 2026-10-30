@@ -3,14 +3,14 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from btcagent.backtest import engine, metrics
-from btcagent.data import features, history
-from btcagent.improve import gatekeeper
-from btcagent.risk.killswitch import emergency_plan
-from btcagent.strategies.rules import StrategyState, target
+from cryptoagent.backtest import engine, metrics
+from cryptoagent.data import features, history
+from cryptoagent.improve import gatekeeper
+from cryptoagent.risk.killswitch import emergency_plan
+from cryptoagent.strategies.rules import StrategyState, target
 from conftest import DATA_DIR, has_data, pf
 
-needs_data = pytest.mark.skipif(not has_data(), reason="historical data not downloaded (btcagent data refresh)")
+needs_data = pytest.mark.skipif(not has_data(), reason="historical data not downloaded (cryptoagent data refresh)")
 
 
 @pytest.fixture(scope="module")
@@ -82,7 +82,7 @@ def _bear_week(price, days_since_ath, below=True):
 
 
 def test_ladder_unreachable_by_default_and_reachable_when_enabled():
-    from btcagent.strategies.rules import advance_state
+    from cryptoagent.strategies.rules import advance_state
     p = gatekeeper.champion_params(gatekeeper.load_strategies())
     assert p["cycle_guard"]["ladder_after_exit"] is False              # champion = v2 behaviour
     for ladder, expect in ((False, [1.0, 1.0, 1.0, 1.0, 1.0]), (True, [1.0, 0.75, 0.5, 0.25, 0.0])):

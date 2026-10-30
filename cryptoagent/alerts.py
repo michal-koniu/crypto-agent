@@ -45,7 +45,7 @@ class Alerts:
             return False
 
     def _telegram(self, text: str) -> bool:
-        tok, chat = os.environ.get("BTCAGENT_TELEGRAM_TOKEN"), os.environ.get("BTCAGENT_TELEGRAM_CHAT")
+        tok, chat = os.environ.get("CRYPTOAGENT_TELEGRAM_TOKEN"), os.environ.get("CRYPTOAGENT_TELEGRAM_CHAT")
         if not tok or not chat:
             return False
         try:

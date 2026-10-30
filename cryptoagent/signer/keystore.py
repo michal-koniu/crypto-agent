@@ -1,9 +1,9 @@
 """Encrypted keystore handling. The private key exists in plaintext only inside the signer process's memory.
 
 Password sources, in order:
-  1. BTCAGENT_KEYSTORE_PASSWORD_CMD: a command whose stdout is the password (e.g. `bw-secret btc-agent#keystore`
+  1. CRYPTOAGENT_KEYSTORE_PASSWORD_CMD: a command whose stdout is the password (e.g. `bw-secret crypto-agent#keystore`
      with the rig's Bitwarden vault) - preferred;
-  2. BTCAGENT_KEYSTORE_PASSWORD: the password itself (tests and forks only).
+  2. CRYPTOAGENT_KEYSTORE_PASSWORD: the password itself (tests and forks only).
 """
 from __future__ import annotations
 
@@ -17,11 +17,11 @@ from eth_account import Account
 
 
 def _password() -> str:
-    cmd = os.environ.get("BTCAGENT_KEYSTORE_PASSWORD_CMD")
+    cmd = os.environ.get("CRYPTOAGENT_KEYSTORE_PASSWORD_CMD")
     if cmd:
         out = subprocess.run(shlex.split(cmd), capture_output=True, text=True, timeout=60, check=True).stdout
         return out.strip()
-    pw = os.environ.get("BTCAGENT_KEYSTORE_PASSWORD")
+    pw = os.environ.get("CRYPTOAGENT_KEYSTORE_PASSWORD")
     if pw:
         return pw
     raise RuntimeError("no keystore password source configured")

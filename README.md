@@ -1,4 +1,4 @@
-# Crypto agent (`btc-agent`)
+# Crypto agent (`crypto-agent`)
 
 An autonomous agent that manages a crypto portfolio with one objective: **grow its value measured in BTC**.
 The benchmark is simply holding BTC. Built to run 24/7 on a home rig with local LLMs (4× Radeon AI PRO R9700),
@@ -58,11 +58,11 @@ Most of the time the agent simply holds BTC. That is by design.
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -e ".[dev]" yfinance
-.venv/bin/btcagent data refresh            # ~8 min the first time
-.venv/bin/btcagent frozen verify
+.venv/bin/cryptoagent data refresh            # ~8 min the first time
+.venv/bin/cryptoagent frozen verify
 .venv/bin/python -m pytest -q              # unit + integration (live-LLM and fork tests are opt-in, see TESTING)
-.venv/bin/btcagent decide                  # one full decision cycle with the rig's models, paper money
-systemctl --user enable --now btcagent     # 24/7 (deploy/systemd/)
+.venv/bin/cryptoagent decide                  # one full decision cycle with the rig's models, paper money
+systemctl --user enable --now cryptoagent     # 24/7 (deploy/systemd/)
 ```
 
 Private repository. Never commit secrets: the rig token, API keys, keystore passwords and keystores stay out of git

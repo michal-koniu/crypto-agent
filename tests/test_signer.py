@@ -9,9 +9,9 @@ import pytest
 from eth_abi import encode
 from eth_utils import keccak
 
-from btcagent import frozen
-from btcagent.signer import keystore
-from btcagent.signer.policy import (SEL_APPROVE, SEL_EXACT_INPUT_SINGLE, SEL_SUPPLY, SEL_TRANSFER, SEL_WITHDRAW,
+from cryptoagent import frozen
+from cryptoagent.signer import keystore
+from cryptoagent.signer.policy import (SEL_APPROVE, SEL_EXACT_INPUT_SINGLE, SEL_SUPPLY, SEL_TRANSFER, SEL_WITHDRAW,
                                     SignRequest, check_cex_order, check_tx)
 
 ALLOW, LIMITS = frozen.allowlists(), frozen.limits()
@@ -115,7 +115,7 @@ def test_cex_order_rules():
 
 
 def test_keystore_never_exposes_key(tmp_path, monkeypatch):
-    monkeypatch.setenv("BTCAGENT_KEYSTORE_PASSWORD", "test-only-password")
+    monkeypatch.setenv("CRYPTOAGENT_KEYSTORE_PASSWORD", "test-only-password")
     pk = "0x" + "11" * 32
     addr = keystore.create(tmp_path / "k.json", private_key=pk)
     text = (tmp_path / "k.json").read_text()
@@ -126,9 +126,9 @@ def test_keystore_never_exposes_key(tmp_path, monkeypatch):
 
 def test_signer_daemon_end_to_end(tmp_path, monkeypatch):
     """Run the real HTTP signer; it signs an allowlisted swap and refuses a hostile one."""
-    from btcagent.signer.client import SignerClient, SignerRefused
-    from btcagent.signer.server import serve
-    monkeypatch.setenv("BTCAGENT_KEYSTORE_PASSWORD", "test-only-password")
+    from cryptoagent.signer.client import SignerClient, SignerRefused
+    from cryptoagent.signer.server import serve
+    monkeypatch.setenv("CRYPTOAGENT_KEYSTORE_PASSWORD", "test-only-password")
     ks = tmp_path / "k.json"
     addr = keystore.create(ks)
     port = 18791
@@ -154,8 +154,8 @@ def test_signer_daemon_end_to_end(tmp_path, monkeypatch):
 def test_rate_limit_never_blocks_exits_or_derisking(tmp_path, monkeypatch):
     """Normal orders hit the hourly cap; withdrawals to self, approve-to-zero and (while killed) exits still sign,
     against their own bounded ceiling."""
-    from btcagent.signer.server import EMERGENCY_SIGNATURES_PER_HOUR, Signer
-    monkeypatch.setenv("BTCAGENT_KEYSTORE_PASSWORD", "test-only-password")
+    from cryptoagent.signer.server import EMERGENCY_SIGNATURES_PER_HOUR, Signer
+    monkeypatch.setenv("CRYPTOAGENT_KEYSTORE_PASSWORD", "test-only-password")
     ks = tmp_path / "k.json"
     addr = keystore.create(ks)
     sg = Signer(tmp_path / "st", str(ks), "fork")

@@ -1,6 +1,6 @@
 """Historical market for replay runs: prices and quotes come from the daily panel at a simulated date.
 
-Used by `btcagent replay` (end-to-end and self-improvement tests on real history with live LLMs). Quotes use a
+Used by `cryptoagent replay` (end-to-end and self-improvement tests on real history with live LLMs). Quotes use a
 fixed spread and a size-dependent slippage, so costs stay realistic without an order book.
 Note: an LLM replaying the past may know what happened next (training data), so replay results test the mechanics,
 not the analyst's skill. Performance evidence comes from backtests of the rules and from forward paper trading.

@@ -7,7 +7,7 @@ from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
-from btcagent.ledger.store import Ledger
+from cryptoagent.ledger.store import Ledger
 
 state = Path(sys.argv[1]).expanduser()
 led = Ledger(state / "ledger.db")

@@ -1,10 +1,10 @@
 # Operational configuration (human-owned, not frozen: changing it changes operations, not safety).
 # Safety limits live in frozen/limits.yaml; models in config/models.yaml.
 
-mode: paper                     # paper | fork | live (live also needs frozen stage=live and BTCAGENT_LIVE=...)
+mode: paper                     # paper | fork | live (live also needs frozen stage=live and CRYPTOAGENT_LIVE=...)
 executor: paper                 # paper (live prices, simulated fills) | evm (Base; fork or live) | cex (via signer)
-state_dir: ~/.local/state/btcagent
-data_dir: ~/.local/share/btcagent/data
+state_dir: ~/.local/state/cryptoagent
+data_dir: ~/.local/share/cryptoagent/data
 models: config/models.yaml
 strategies: evolvable/strategies.yaml
 playbook: evolvable/playbook.yaml
@@ -40,7 +40,7 @@ yield:
   expected_apy: 0.05
   lockup_hours: 0
 
-protocol_status:                 # deterministic guard (btcagent/risk/protocol_status.py): reserve flags before deposits, every tick
+protocol_status:                 # deterministic guard (cryptoagent/risk/protocol_status.py): reserve flags before deposits, every tick
   enabled: true
   rpc_url: https://mainnet.base.org   # read-only; paper mode mirrors the real Aave reserve flags; fork/live use the executor's RPC
   ttl_seconds: 300
@@ -57,5 +57,5 @@ news:
 alerts:
   email_to: offlinelocalagents@gmail.com   # via the rig's msmtp (already configured for Netdata alerts)
   email_enabled: true
-  telegram_enabled: false        # needs BTCAGENT_TELEGRAM_TOKEN and BTCAGENT_TELEGRAM_CHAT in the environment
+  telegram_enabled: false        # needs CRYPTOAGENT_TELEGRAM_TOKEN and CRYPTOAGENT_TELEGRAM_CHAT in the environment
   min_interval_minutes: 30       # rate limit for repeated alerts of the same kind

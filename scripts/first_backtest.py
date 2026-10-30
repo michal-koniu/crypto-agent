@@ -1,9 +1,9 @@
 """Quick research run: refresh data, build features, backtest the champion vs HODL. Prints JSON."""
 import json, sys, yaml
 from pathlib import Path
-from btcagent.data import history, features
-from btcagent.backtest import engine, metrics
-data_dir = Path(sys.argv[1] if len(sys.argv) > 1 else "~/.local/share/btcagent/data").expanduser()
+from cryptoagent.data import history, features
+from cryptoagent.backtest import engine, metrics
+data_dir = Path(sys.argv[1] if len(sys.argv) > 1 else "~/.local/share/cryptoagent/data").expanduser()
 if "--refresh" in sys.argv:
     history.download_all(data_dir)
 daily = history.panel(data_dir)
